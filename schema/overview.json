@@ -1,0 +1,22 @@
+{
+    "$schema": "http://json-schema.org/draft-06/schema#",
+    "description": "A representation of some SVN-repository",
+    "type": "object",
+    "properties": {
+        "root": { "type": "string" },
+        "size": { "type": "number" },
+        "branches": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": { "type": "string" },
+                    "status": { "type": "string" },
+                    "created_at": { "type": "string", "format": "date" },
+                    "commit": { "type": "string" },
+                    "creator": { "type": "string" }
+                }
+            }
+        }
+    }
+}
