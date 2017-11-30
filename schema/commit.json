@@ -3,22 +3,35 @@
     "description": "A representation of a commit from some SVN-repo",
     "type": "object",
     "properties": {
-        "commited_at": { "type": "string", "format": "date" },
-        "message": { "type": "string" },
-        "commiter": { "type": "string" },
-        "difference": { "type": "numeric" },
-        "files": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "size": { "type": "numeric" },
-                    "flags": { "type": "string" },
-                    "difference": { "type": "numeric" },
-                    "path": { "type": "string" },
-                    "branch": { "type": "string" }
+        "status": {
+            "type": "string",
+            "pattern": "success|warning|failure"
+        },
+        "reason": { "type": "string" },
+        "data": {
+            "type": "object",
+            "properties": {
+                "commited_at": { "type": "number" },
+                "message": { "type": "string" },
+                "commiter": { "type": "string" },
+                "difference": { "type": "numeric" },
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "size": { "type": "numeric" },
+                            "flags": { 
+                                "type": "string",
+                                "pattern": "A|D|M|R"
+                            },
+                            "difference": { "type": "numeric" },
+                            "path": { "type": "string" },
+                            "branch": { "type": "string" }
+                        }
+                    }
                 }
-            }
+            }                        
         }
     }
 }
