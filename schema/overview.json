@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/draft-06/schema#",
+    "$schema": "http://json-schema.org/draft-07/schema#",
     "description": "A representation of some SVN-repository",
     "type": "object",
     "properties": {
@@ -10,7 +10,7 @@
         "reason": { "type": "string" },
         "data": {
             "last_sych_date": { "type": "number" },
-            "type": { "type": "string", "pattern": "git|hg|svn" },
+            "type": { "type": "string", "pattern": "svn" },
             "url": { "type": "string" },
             "size": { "type": "number" },
             "branches": {
