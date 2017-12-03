@@ -9,26 +9,32 @@
         },
         "reason": { "type": "string" },
         "data": {
-            "last_sych_date": { "type": "number" },
-            "type": { "type": "string", "pattern": "svn" },
-            "url": { "type": "string" },
-            "size": { "type": "number" },
-            "branches": {
-                "type": "array",
-                "items": {
-                    "type": "object",
-                    "properties": {
-                        "name": { "type": "string" },
-                        "status": { 
-                            "type": "string",
-                            "pattern": "unlocked|locked"
-                        },
-                        "created_at": { "type": "number" },
-                        "initial_commit": { "type": "string" },
-                        "author": { "type": "string" }
+            "type": "object",
+            "properties": {
+                "last_sych_date": { "type": "number" },
+                "type": { 
+                    "type": "string",
+                    "pattern": "svn"
+                },
+                "url": { "type": "string" },
+                "size": { "type": "number" },
+                "branches": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": { "type": "string" },
+                            "status": { 
+                                "type": "string",
+                                "pattern": "unlocked|locked"
+                            },
+                            "created_at": { "type": "number" },
+                            "initial_commit": { "type": "string" },
+                            "author": { "type": "string" }
+                        }
                     }
                 }
-            }
+            }            
         }        
     }
 }

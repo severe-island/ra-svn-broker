@@ -14,18 +14,18 @@
                 "commited_at": { "type": "number" },
                 "message": { "type": "string" },
                 "commiter": { "type": "string" },
-                "difference": { "type": "numeric" },
+                "difference": { "type": "number" },
                 "files": {
                     "type": "array",
                     "items": {
                         "type": "object",
                         "properties": {
-                            "size": { "type": "numeric" },
+                            "size": { "type": "number" },
                             "flag": { 
                                 "type": "string",
                                 "pattern": "A|D|M|R"
                             },
-                            "difference": { "type": "numeric" },
+                            "difference": { "type": "number" },
                             "path": { "type": "string" },
                             "branch": { "type": "string" }
                         }
