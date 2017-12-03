@@ -12,7 +12,7 @@
             "type": "object",
             "properties": {
                 "last_sych_date": { "type": "number" },
-                "type": { 
+                "repo_type": { 
                     "type": "string",
                     "pattern": "svn"
                 },

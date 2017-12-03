@@ -1,0 +1,120 @@
+openapi: 3.0.0
+info:
+  title: SVN-broker
+  description: >-
+    Web-service for collecting data from SVN-repositories and transfering it to
+    repository-aggregator.
+  version: 0.0.1
+servers:
+  - url: 'http://localhost'
+    description: Debug
+paths:
+  /overview:
+    get:
+      summary: Returns a repository overview.
+      description: Returns a repository overview.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Overview'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        default:
+          description: Unexpected Error
+  /commit:
+    get:
+      summary: Returns a commit info.
+      description: Returns a commit info.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Commit'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        default:
+          description: Unexpected Error
+components:
+  schemas:
+    Overview:
+      description: A representation of some SVN-repository
+      type: object
+      properties:
+        status:
+          type: string
+          pattern: success|warning|failure
+        reason:
+          type: string
+        data:
+          type: object
+          properties:
+            last_sych_date:
+              type: number
+            repo_type:
+              type: string
+              pattern: svn
+            url:
+              type: string
+            size:
+              type: number
+            branches:
+              type: array
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  status:
+                    type: string
+                    pattern: unlocked|locked
+                  created_at:
+                    type: number
+                  initial_commit:
+                    type: string
+                  author:
+                    type: string
+    Commit:
+      description: A representation of a commit from some SVN-repo
+      type: object
+      properties:
+        status:
+          type: string
+          pattern: success|warning|failure
+        reason:
+          type: string
+        data:
+          type: object
+          properties:
+            commited_at:
+              type: number
+            message:
+              type: string
+            commiter:
+              type: string
+            difference:
+              type: number
+            files:
+              type: array
+              items:
+                type: object
+                properties:
+                  size:
+                    type: number
+                  flag:
+                    type: string
+                    pattern: A|D|M|R
+                  difference:
+                    type: number
+                  path:
+                    type: string
+                  branch:
+                    type: string
