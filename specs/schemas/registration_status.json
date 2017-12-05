@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description": "Answer to request for repository registration",
+    "type": "object",
+    "properties": {
+        "status": {
+            "type": "string",
+            "pattern": "success|warning|failure"
+        },
+        "reason": { "type": "string" }
+    }
+}

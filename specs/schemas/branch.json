@@ -1,0 +1,26 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description": "A representation of simple branch from SVN-repo",
+    "type": "object",
+    "properties": {
+        "status": {
+            "type": "string",
+            "pattern": "success|warning|failure"
+        },
+        "reason": { "type": "string" },
+        "data": {
+            "type": "object",
+            "properties": {
+                "name": { "type": "string" },
+                "status": { 
+                    "type": "string",
+                    "pattern": "unlocked|locked"
+                },
+                "created_at": { "type": "number" },
+                "initial_commit": { "type": "string" },
+                "author": { "type": "string" }
+            }
+        }
+    },
+    "required": [ "status", "reason" ]
+}

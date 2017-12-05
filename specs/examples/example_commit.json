@@ -2,9 +2,9 @@
     "status": "warning",
     "reason": "Repo is unavailable: cashed data was returned",
     "data": {
-        "commited_at": 123456,
+        "committed_at": 123456,
         "message": "more cats are added",
-        "commiter": "knyazz",
+        "committer": "knyazz",
         "negativeDelta": 38,
         "positiveDelta": 56,
         "branch": "master",
@@ -35,7 +35,7 @@
                 "flag": "D",
                 "negativeDelta": 19,
                 "positiveDelta": 0,
-                "path": "bad.cpp",
+                "path": "bad.cpp"
             }
         ]
     }

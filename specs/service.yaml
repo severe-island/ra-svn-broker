@@ -1,0 +1,274 @@
+swagger: '2.0'
+info:
+  title: SVN-broker
+  description: >-
+    Web-service for collecting data from SVN-repositories and transfering it to
+    repository-aggregator.
+  version: 0.0.1
+host: localhost:3003
+schemes:
+  - http
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /repositories:
+    post:
+      summary: Register of repository.
+      description: Register of repository.
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: url
+          type: string
+          required: true
+          in: formData
+        - name: login
+          type: string
+          required: true
+          in: formData
+        - name: password
+          type: string
+          required: true
+          in: formData
+        - name: id
+          type: string
+          required: true
+          in: formData
+      responses:
+        '201':
+          description: Created
+          schema:
+            $ref: '#/definitions/RegistrationStatus'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+
+  /repositories/{id}:
+    get:
+      summary: Returns a repository overview.
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Overview'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        default:
+          description: Unexpected Error
+
+  /repositories/{id}/commits:
+    get:
+      summary: Returns a list of commits.
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/List'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        default:
+          description: Unexpected Error
+
+  /repositories/{id}/commit/{commit_id}:
+    get:
+      summary: Returns simple commit.
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+        - name: commit_id
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Commit'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        default:
+          description: Unexpected Error
+  
+  /repositories/{id}/branches:
+    get:
+      summary: Returns a list of branches.
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/List'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        default:
+          description: Unexpected Error
+
+  /repositories/{id}/branches/{branch_id}:
+    get:
+      summary: Returns simple branch.
+      parameters:
+        - name: id
+          in: path
+          type: string
+          required: true
+        - name: branch_id
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Branch'
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        default:
+          description: Unexpected Error
+          
+definitions:
+  RegistrationStatus:
+    description: Status of repository registration
+    type: object
+    properties:
+      status:
+        type: string
+        pattern: success|warning|failure
+      reason:
+        type: string
+  Overview:
+    description: A representation of some SVN-repository
+    type: object
+    properties:
+      status:
+        type: string
+        pattern: success|warning|failure
+      reason:
+        type: string
+      data:
+        type: object
+        properties:
+          last_sych_date:
+            type: number
+          repo_type:
+            type: string
+            pattern: svn
+          url:
+            type: string
+          size:
+            type: number
+    required:
+      - status
+      - reason
+  Branch:
+    description: A representation of branch from SVN repo
+    type: object
+    properties:
+      status:
+        type: string
+        pattern: success|warning|failure
+      reason:
+        type: string
+      data:
+        type: object
+        properties:
+          name:
+            type: string
+          status:
+            type: string
+            pattern: unlocked|locked
+          created_at:
+            type: number
+          initial_commit:
+            type: string
+          author:
+            type: string
+  Commit:
+    description: A representation of a commit from some SVN-repo
+    type: object
+    properties:
+      status:
+        type: string
+        pattern: success|warning|failure
+      reason:
+        type: string
+      data:
+        type: object
+        properties:
+          committed_at:
+            type: number
+          message:
+            type: string
+          committer:
+            type: string
+          positiveDelta:
+            type: number
+          negativeDelta:
+            type: number
+          branch:
+            type: string
+          files:
+            type: array
+            items:
+              type: object
+              properties:
+                size:
+                  type: number
+                flag:
+                  type: string
+                  pattern: A|D|M|R
+                positiveDelta:
+                  type: number
+                negativeDelta:
+                  type: number
+                path:
+                  type: string
+    required:
+      - status
+      - reason
+  List:
+    description: A representation of multiple data from SVN-repo
+    type: object
+    properties:
+      status:
+        type: string
+        pattern: success|warning|failure
+      reason:
+        type: string
+      data:
+        type: array
+        items:
+          type: string
+    required:
+      - status
+      - reason
+  
