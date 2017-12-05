@@ -1,0 +1,42 @@
+{
+    "status": "warning",
+    "reason": "Repo is unavailable: cashed data was returned",
+    "data": {
+        "commited_at": 123456,
+        "message": "more cats are added",
+        "commiter": "knyazz",
+        "negativeDelta": 38,
+        "positiveDelta": 56,
+        "branch": "master",
+        "files": [
+            {
+                "size": 1024,
+                "flag": "M",
+                "negativeDelta": 18,
+                "positiveDelta": 20,
+                "path": "main.cpp"
+            },
+            {
+                "size": 512,
+                "flag": "M",
+                "negativeDelta": 1,
+                "positiveDelta": 0,
+                "path": "corrupted.cpp"
+            },
+            {
+                "size": 685,
+                "flag": "A",
+                "negativeDelta": 0,
+                "positiveDelta": 36,
+                "path": "cats.cpp"
+            },
+            {
+                "size": 344,
+                "flag": "D",
+                "negativeDelta": 19,
+                "positiveDelta": 0,
+                "path": "bad.cpp",
+            }
+        ]
+    }
+}

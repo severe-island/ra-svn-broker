@@ -14,7 +14,9 @@
                 "commited_at": { "type": "number" },
                 "message": { "type": "string" },
                 "commiter": { "type": "string" },
-                "difference": { "type": "number" },
+                "positiveDelta": { "type": "number" },
+                "negativeDelta": { "type": "number" },
+                "branch": { "type": "string" },
                 "files": {
                     "type": "array",
                     "items": {
@@ -25,13 +27,14 @@
                                 "type": "string",
                                 "pattern": "A|D|M|R"
                             },
-                            "difference": { "type": "number" },
-                            "path": { "type": "string" },
-                            "branch": { "type": "string" }
+                            "positiveDelta": { "type": "number" },
+                            "negativeDelta": { "type": "number" },
+                            "path": { "type": "string" }
                         }
                     }
                 }
             }                        
         }
-    }
+    },
+    "required": [ "status", "reason" ]
 }

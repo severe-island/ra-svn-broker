@@ -1,18 +1,23 @@
 openapi: 3.0.0
 info:
   title: SVN-broker
-  description: >-
-    Web-service for collecting data from SVN-repositories and transfering it to
-    repository-aggregator.
+  description: Web-service for collecting data from SVN-repositories and transfering it to repository-aggregator.
   version: 0.0.1
+
 servers:
-  - url: 'http://localhost'
+  - url: http://localhost # тут адрес, по которому обращаемся к серверу
     description: Debug
+
 paths:
   /overview:
     get:
       summary: Returns a repository overview.
-      description: Returns a repository overview.
+      parameters:
+        - name: url
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: OK
@@ -26,10 +31,21 @@ paths:
           description: Not Found
         default:
           description: Unexpected Error
+  
   /commit:
     get:
       summary: Returns a commit info.
-      description: Returns a commit info.
+      parameters:
+        - name: url
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: revision
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: OK
@@ -43,6 +59,7 @@ paths:
           description: Not Found
         default:
           description: Unexpected Error
+          
 components:
   schemas:
     Overview:
@@ -82,6 +99,9 @@ components:
                     type: string
                   author:
                     type: string
+      required:
+        - status
+        - reason
     Commit:
       description: A representation of a commit from some SVN-repo
       type: object
@@ -100,8 +120,12 @@ components:
               type: string
             commiter:
               type: string
-            difference:
+            positiveDelta:
               type: number
+            negativeDelta:
+              type: number
+            branch:
+              type: string
             files:
               type: array
               items:
@@ -112,9 +136,12 @@ components:
                   flag:
                     type: string
                     pattern: A|D|M|R
-                  difference:
+                  positiveDelta:
+                    type: number
+                  negativeDelta:
                     type: number
                   path:
                     type: string
-                  branch:
-                    type: string
+      required:
+        - status
+        - reason

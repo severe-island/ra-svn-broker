@@ -1,0 +1,33 @@
+{
+    "status": "success",
+    "reason": "success",
+    "data": {
+        "last_sych_date": 1234567,
+        "repo_type": "svn",
+        "url": "http://svn.example.com/code",
+        "size": 123456,
+        "branches": [
+            {
+                "name": "master",
+                "status": "unlocked",
+                "created_at": 1234567,
+                "initial_commit": "r1",
+                "author": "leonard"
+            },
+            {
+                "name": "services",
+                "status": "unlocked",
+                "created_at": 1234568,
+                "initial_commit": "r123",
+                "author": "sheldon"
+            },
+            {
+                "name": "dead",
+                "status": "locked",
+                "created_at": 12345690,
+                "initial_commit": "r1234",
+                "author": "penny"
+            }
+        ]
+    }
+}
