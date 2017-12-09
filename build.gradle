@@ -15,7 +15,7 @@ apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 
 group = 'org.repoaggr'
-version = '0.0.1-SNAPSHOT'
+version = '0.0.2-SNAPSHOT'
 sourceCompatibility = 1.8
 
 repositories {
@@ -28,5 +28,6 @@ dependencies {
 	compile group: 'io.swagger', name: 'swagger-annotations', version: '1.5.4'
 	compile group: 'io.springfox', name: 'springfox-swagger2', version: '2.4.0'
 	compile group: 'joda-time', name: 'joda-time', version: '2.8.1'
+	compile group: 'org.tmatesoft.svnkit', name: 'svnkit', version: '1.7.5'
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }

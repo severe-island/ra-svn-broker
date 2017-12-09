@@ -22,7 +22,11 @@ import java.util.List;
 
 import javax.validation.constraints.*;
 import javax.validation.Valid;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-07T13:58:22.696Z")
+
+import org.repoaggr.svnbrk.controller.RemoteSvnController;
+import org.tmatesoft.svn.core.SVNException;
+
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-09T09:35:53.477Z")
 
 @Controller
 public class RepositoriesApiController implements RepositoriesApi {
@@ -57,11 +61,11 @@ public class RepositoriesApiController implements RepositoriesApi {
     }
 
     public ResponseEntity<RegistrationStatus> repositoriesPost(@ApiParam(value = "", required=true) @RequestPart(value="url", required=true)  String url,
-        @ApiParam(value = "", required=true) @RequestPart(value="login", required=true)  String login,
-        @ApiParam(value = "", required=true) @RequestPart(value="password", required=true)  String password,
-        @ApiParam(value = "", required=true) @RequestPart(value="id", required=true)  String id) {
+        @ApiParam(value = "", required=true) @RequestPart(value="id", required=true)  String id,
+        @ApiParam(value = "") @RequestPart(value="login", required=false)  String login,
+        @ApiParam(value = "") @RequestPart(value="password", required=false)  String password) {
         // do some magic!
-        return new ResponseEntity<RegistrationStatus>(HttpStatus.OK);
+        return RemoteSvnController.postRegistrationStatus(url, login, password, id);
     }
 
 }

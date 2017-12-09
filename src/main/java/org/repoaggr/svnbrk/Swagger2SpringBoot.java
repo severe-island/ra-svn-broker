@@ -10,7 +10,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication
 @EnableSwagger2
-@ComponentScan(basePackages = { "io.swagger", "io.swagger.api" })
+@ComponentScan(basePackages = { "org.repoaggr.svnbrk", "org.repoaggr.svnbrk.api" })
 public class Swagger2SpringBoot implements CommandLineRunner {
 
     @Override

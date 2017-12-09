@@ -4,13 +4,13 @@ info:
   description: >-
     Web-service for collecting data from SVN-repositories and transfering it to
     repository-aggregator.
-  version: 0.0.1
+  version: 0.0.2
 host: localhost:3003
 schemes:
   - http
   - https
 consumes:
-  - application/json
+  - application/x-www-form-urlencoded
 produces:
   - application/json
 paths:
@@ -27,11 +27,11 @@ paths:
           in: formData
         - name: login
           type: string
-          required: true
+          required: false
           in: formData
         - name: password
           type: string
-          required: true
+          required: false
           in: formData
         - name: id
           type: string
@@ -44,6 +44,10 @@ paths:
             $ref: '#/definitions/RegistrationStatus'
         '400':
           description: Bad Request
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/RegistrationStatus'
         '404':
           description: Not Found
 
@@ -62,10 +66,12 @@ paths:
             $ref: '#/definitions/Overview'
         '400':
           description: Bad Request
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Overview'
         '404':
           description: Not Found
-        default:
-          description: Unexpected Error
 
   /repositories/{id}/commits:
     get:
@@ -82,10 +88,12 @@ paths:
             $ref: '#/definitions/List'
         '400':
           description: Bad Request
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/List'
         '404':
           description: Not Found
-        default:
-          description: Unexpected Error
 
   /repositories/{id}/commit/{commit_id}:
     get:
@@ -106,10 +114,12 @@ paths:
             $ref: '#/definitions/Commit'
         '400':
           description: Bad Request
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Commit'
         '404':
           description: Not Found
-        default:
-          description: Unexpected Error
   
   /repositories/{id}/branches:
     get:
@@ -126,10 +136,12 @@ paths:
             $ref: '#/definitions/List'
         '400':
           description: Bad Request
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/List'
         '404':
           description: Not Found
-        default:
-          description: Unexpected Error
 
   /repositories/{id}/branches/{branch_id}:
     get:
@@ -148,12 +160,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/Branch'
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Branch'
         '400':
           description: Bad Request
         '404':
           description: Not Found
-        default:
-          description: Unexpected Error
           
 definitions:
   RegistrationStatus:

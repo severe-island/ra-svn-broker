@@ -25,7 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import javax.validation.constraints.*;
 import javax.validation.Valid;
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-07T13:58:22.696Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-09T09:35:53.477Z")
 
 @Api(value = "repositories", description = "the repositories API")
 public interface RepositoriesApi {
@@ -34,12 +34,12 @@ public interface RepositoriesApi {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = Branch.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Void.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Void.class),
-        @ApiResponse(code = 200, message = "Unexpected Error", response = Void.class) })
+        @ApiResponse(code = 403, message = "Forbidden", response = Branch.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Void.class) })
     
     @RequestMapping(value = "/repositories/{id}/branches/{branch_id}",
         produces = { "application/json" }, 
-        consumes = { "application/json" },
+        consumes = { "application/x-www-form-urlencoded" },
         method = RequestMethod.GET)
     ResponseEntity<Branch> repositoriesIdBranchesBranchIdGet(@ApiParam(value = "",required=true ) @PathVariable("id") String id,@ApiParam(value = "",required=true ) @PathVariable("branch_id") String branchId);
 
@@ -48,12 +48,12 @@ public interface RepositoriesApi {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = List.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Void.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Void.class),
-        @ApiResponse(code = 200, message = "Unexpected Error", response = Void.class) })
+        @ApiResponse(code = 403, message = "Forbidden", response = List.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Void.class) })
     
     @RequestMapping(value = "/repositories/{id}/branches",
         produces = { "application/json" }, 
-        consumes = { "application/json" },
+        consumes = { "application/x-www-form-urlencoded" },
         method = RequestMethod.GET)
     ResponseEntity<List> repositoriesIdBranchesGet(@ApiParam(value = "",required=true ) @PathVariable("id") String id);
 
@@ -62,12 +62,12 @@ public interface RepositoriesApi {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = Commit.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Void.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Void.class),
-        @ApiResponse(code = 200, message = "Unexpected Error", response = Void.class) })
+        @ApiResponse(code = 403, message = "Forbidden", response = Commit.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Void.class) })
     
     @RequestMapping(value = "/repositories/{id}/commit/{commit_id}",
         produces = { "application/json" }, 
-        consumes = { "application/json" },
+        consumes = { "application/x-www-form-urlencoded" },
         method = RequestMethod.GET)
     ResponseEntity<Commit> repositoriesIdCommitCommitIdGet(@ApiParam(value = "",required=true ) @PathVariable("id") String id,@ApiParam(value = "",required=true ) @PathVariable("commit_id") String commitId);
 
@@ -76,12 +76,12 @@ public interface RepositoriesApi {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = List.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Void.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Void.class),
-        @ApiResponse(code = 200, message = "Unexpected Error", response = Void.class) })
+        @ApiResponse(code = 403, message = "Forbidden", response = List.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Void.class) })
     
     @RequestMapping(value = "/repositories/{id}/commits",
         produces = { "application/json" }, 
-        consumes = { "application/json" },
+        consumes = { "application/x-www-form-urlencoded" },
         method = RequestMethod.GET)
     ResponseEntity<List> repositoriesIdCommitsGet(@ApiParam(value = "",required=true ) @PathVariable("id") String id);
 
@@ -90,12 +90,12 @@ public interface RepositoriesApi {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = Overview.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Void.class),
-        @ApiResponse(code = 404, message = "Not Found", response = Void.class),
-        @ApiResponse(code = 200, message = "Unexpected Error", response = Void.class) })
+        @ApiResponse(code = 403, message = "Forbidden", response = Overview.class),
+        @ApiResponse(code = 404, message = "Not Found", response = Void.class) })
     
     @RequestMapping(value = "/repositories/{id}",
         produces = { "application/json" }, 
-        consumes = { "application/json" },
+        consumes = { "application/x-www-form-urlencoded" },
         method = RequestMethod.GET)
     ResponseEntity<Overview> repositoriesIdGet(@ApiParam(value = "",required=true ) @PathVariable("id") String id);
 
@@ -104,12 +104,16 @@ public interface RepositoriesApi {
     @ApiResponses(value = { 
         @ApiResponse(code = 201, message = "Created", response = RegistrationStatus.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Void.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = RegistrationStatus.class),
         @ApiResponse(code = 404, message = "Not Found", response = Void.class) })
     
     @RequestMapping(value = "/repositories",
-        produces = { "application/json" }, 
-        consumes = { "application/x-www-form-urlencoded" },
         method = RequestMethod.POST)
-    ResponseEntity<RegistrationStatus> repositoriesPost(@ApiParam(value = "", required=true) @RequestPart(value="url", required=true)  String url,@ApiParam(value = "", required=true) @RequestPart(value="login", required=true)  String login,@ApiParam(value = "", required=true) @RequestPart(value="password", required=true)  String password,@ApiParam(value = "", required=true) @RequestPart(value="id", required=true)  String id);
+    ResponseEntity<RegistrationStatus> repositoriesPost(
+            @ApiParam(value = "", required=true) @RequestPart(value="url", required=true) String url,
+            @ApiParam(value = "", required=true) @RequestPart(value="id", required=true) String id,
+            @ApiParam(value = "") @RequestPart(value="login", required=false) String login,
+            @ApiParam(value = "") @RequestPart(value="password", required=false) String password
+    );
 
 }

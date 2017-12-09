@@ -13,7 +13,7 @@ import javax.validation.constraints.*;
  * A representation of branch from SVN repo
  */
 @ApiModel(description = "A representation of branch from SVN repo")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-07T13:58:22.696Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-09T09:35:53.477Z")
 
 public class Branch   {
   @JsonProperty("status")
