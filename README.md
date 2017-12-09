@@ -17,7 +17,7 @@ svn-broker
 ```
 
 ## Using
-The REST-service schema is in /specs/serviece.yaml (Swagger-compatible).
+The REST-service schema is in /specs/service.yaml (Swagger-compatible).
 
 ### Warning!
 Using POST-requests for /repositories requires the HTTP-headers:
