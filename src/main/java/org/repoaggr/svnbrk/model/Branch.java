@@ -25,6 +25,12 @@ public class Branch   {
   @JsonProperty("data")
   private BranchData data = null;
 
+  public Branch(String status, String reason, BranchData data) {
+      this.status = status;
+      this.reason = reason;
+      this.data = data;
+  }
+
   public Branch status(String status) {
     this.status = status;
     return this;

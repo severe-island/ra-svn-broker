@@ -25,6 +25,16 @@ public class Commit   {
   @JsonProperty("data")
   private CommitData data = null;
 
+  public Commit(
+          String status,
+          String reason,
+          CommitData data
+  ) {
+      this.status = status;
+      this.reason = reason;
+      this.data = data;
+  }
+
   public Commit status(String status) {
     this.status = status;
     return this;

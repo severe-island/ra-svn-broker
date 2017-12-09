@@ -30,6 +30,20 @@ public class BranchData   {
   @JsonProperty("author")
   private String author = null;
 
+  public BranchData(
+          String name,
+          String status,
+          BigDecimal createdAt,
+          String initialCommit,
+          String author
+  ) {
+      this.name = name;
+      this.status = status;
+      this.createdAt = createdAt;
+      this.initialCommit = initialCommit;
+      this.author = author;
+  }
+
   public BranchData name(String name) {
     this.name = name;
     return this;

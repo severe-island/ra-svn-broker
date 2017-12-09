@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import java.math.BigDecimal;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
@@ -16,21 +15,35 @@ import javax.validation.constraints.*;
 
 public class CommitDataFiles   {
   @JsonProperty("size")
-  private BigDecimal size = null;
+  private int size = 0;
 
   @JsonProperty("flag")
   private String flag = null;
 
   @JsonProperty("positiveDelta")
-  private BigDecimal positiveDelta = null;
+  private int positiveDelta = 0;
 
   @JsonProperty("negativeDelta")
-  private BigDecimal negativeDelta = null;
+  private int negativeDelta = 0;
 
   @JsonProperty("path")
   private String path = null;
 
-  public CommitDataFiles size(BigDecimal size) {
+  public CommitDataFiles(
+          int size,
+          String flag,
+          int positiveDelta,
+          int negativeDelta,
+          String path
+  ) {
+      this.size = size;
+      this.flag = flag;
+      this.positiveDelta = positiveDelta;
+      this.negativeDelta = negativeDelta;
+      this.path = path;
+  }
+
+  public CommitDataFiles size(int size) {
     this.size = size;
     return this;
   }
@@ -43,11 +56,11 @@ public class CommitDataFiles   {
 
   @Valid
 
-  public BigDecimal getSize() {
+  public int getSize() {
     return size;
   }
 
-  public void setSize(BigDecimal size) {
+  public void setSize(int size) {
     this.size = size;
   }
 
@@ -71,7 +84,7 @@ public class CommitDataFiles   {
     this.flag = flag;
   }
 
-  public CommitDataFiles positiveDelta(BigDecimal positiveDelta) {
+  public CommitDataFiles positiveDelta(int positiveDelta) {
     this.positiveDelta = positiveDelta;
     return this;
   }
@@ -84,15 +97,15 @@ public class CommitDataFiles   {
 
   @Valid
 
-  public BigDecimal getPositiveDelta() {
+  public int getPositiveDelta() {
     return positiveDelta;
   }
 
-  public void setPositiveDelta(BigDecimal positiveDelta) {
+  public void setPositiveDelta(int positiveDelta) {
     this.positiveDelta = positiveDelta;
   }
 
-  public CommitDataFiles negativeDelta(BigDecimal negativeDelta) {
+  public CommitDataFiles negativeDelta(int negativeDelta) {
     this.negativeDelta = negativeDelta;
     return this;
   }
@@ -105,11 +118,11 @@ public class CommitDataFiles   {
 
   @Valid
 
-  public BigDecimal getNegativeDelta() {
+  public int getNegativeDelta() {
     return negativeDelta;
   }
 
-  public void setNegativeDelta(BigDecimal negativeDelta) {
+  public void setNegativeDelta(int negativeDelta) {
     this.negativeDelta = negativeDelta;
   }
 

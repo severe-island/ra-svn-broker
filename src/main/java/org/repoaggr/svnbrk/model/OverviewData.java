@@ -27,6 +27,18 @@ public class OverviewData   {
   @JsonProperty("size")
   private BigDecimal size = null;
 
+  public OverviewData(
+          BigDecimal lastSychDate,
+          String repoType,
+          String url,
+          BigDecimal size
+  ) {
+      this.lastSychDate = lastSychDate;
+      this.repoType = repoType;
+      this.url = url;
+      this.size = size;
+  }
+
   public OverviewData lastSychDate(BigDecimal lastSychDate) {
     this.lastSychDate = lastSychDate;
     return this;

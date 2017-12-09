@@ -33,38 +33,38 @@ public class RepositoriesApiController implements RepositoriesApi {
 
 
 
-    public ResponseEntity<Branch> repositoriesIdBranchesBranchIdGet(@ApiParam(value = "",required=true ) @PathVariable("id") String id,
-        @ApiParam(value = "",required=true ) @PathVariable("branch_id") String branchId) {
-        // do some magic!
-        return new ResponseEntity<Branch>(HttpStatus.OK);
+    public ResponseEntity<Branch> repositoriesIdBranchesBranchIdGet(
+            @ApiParam(value = "",required=true ) @PathVariable("id") String id,
+            @ApiParam(value = "",required=true ) @PathVariable("branch_id") String branchId) {
+        return RemoteSvnController.getBranch(id, branchId);
     }
 
-    public ResponseEntity<List> repositoriesIdBranchesGet(@ApiParam(value = "",required=true ) @PathVariable("id") String id) {
-        // do some magic!
-        return new ResponseEntity<List>(HttpStatus.OK);
+    public ResponseEntity<List> repositoriesIdBranchesGet(
+            @ApiParam(value = "",required=true ) @PathVariable("id") String id) {
+        return RemoteSvnController.getBranchesList(id);
     }
 
-    public ResponseEntity<Commit> repositoriesIdCommitCommitIdGet(@ApiParam(value = "",required=true ) @PathVariable("id") String id,
-        @ApiParam(value = "",required=true ) @PathVariable("commit_id") String commitId) {
-        // do some magic!
-        return new ResponseEntity<Commit>(HttpStatus.OK);
+    public ResponseEntity<Commit> repositoriesIdCommitCommitIdGet(
+            @ApiParam(value = "",required=true ) @PathVariable("id") String id,
+            @ApiParam(value = "",required=true ) @PathVariable("commit_id") String commitId) {
+        return RemoteSvnController.getCommit(id, commitId);
     }
 
-    public ResponseEntity<List> repositoriesIdCommitsGet(@ApiParam(value = "",required=true ) @PathVariable("id") String id) {
-        // do some magic!
-        return new ResponseEntity<List>(HttpStatus.OK);
+    public ResponseEntity<List> repositoriesIdCommitsGet(
+            @ApiParam(value = "",required=true ) @PathVariable("id") String id) {
+        return RemoteSvnController.getCommitsList(id);
     }
 
-    public ResponseEntity<Overview> repositoriesIdGet(@ApiParam(value = "",required=true ) @PathVariable("id") String id) {
-        // do some magic!
-        return new ResponseEntity<Overview>(HttpStatus.OK);
+    public ResponseEntity<Overview> repositoriesIdGet(
+            @ApiParam(value = "",required=true ) @PathVariable("id") String id) {
+        return RemoteSvnController.getOverview(id);
     }
 
-    public ResponseEntity<RegistrationStatus> repositoriesPost(@ApiParam(value = "", required=true) @RequestPart(value="url", required=true)  String url,
-        @ApiParam(value = "", required=true) @RequestPart(value="id", required=true)  String id,
-        @ApiParam(value = "") @RequestPart(value="login", required=false)  String login,
-        @ApiParam(value = "") @RequestPart(value="password", required=false)  String password) {
-        // do some magic!
+    public ResponseEntity<RegistrationStatus> repositoriesPost(
+            @ApiParam(value = "", required=true) @RequestPart(value="url", required=true)  String url,
+            @ApiParam(value = "", required=true) @RequestPart(value="id", required=true)  String id,
+            @ApiParam(value = "") @RequestPart(value="login", required=false)  String login,
+            @ApiParam(value = "") @RequestPart(value="password", required=false)  String password) {
         return RemoteSvnController.postRegistrationStatus(url, login, password, id);
     }
 

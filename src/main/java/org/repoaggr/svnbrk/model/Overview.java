@@ -25,6 +25,11 @@ public class Overview   {
   @JsonProperty("data")
   private OverviewData data = null;
 
+  public Overview(String status, String reason) {
+      this.status = status;
+      this.reason = reason;
+  }
+
   public Overview status(String status) {
     this.status = status;
     return this;

@@ -28,16 +28,34 @@ public class CommitData   {
   private String committer = null;
 
   @JsonProperty("positiveDelta")
-  private BigDecimal positiveDelta = null;
+  private int positiveDelta = 0;
 
   @JsonProperty("negativeDelta")
-  private BigDecimal negativeDelta = null;
+  private int negativeDelta = 0;
 
   @JsonProperty("branch")
   private String branch = null;
 
   @JsonProperty("files")
   private List<CommitDataFiles> files = null;
+
+  public CommitData(
+          BigDecimal committedAt,
+          String message,
+          String committer,
+          int positiveDelta,
+          int negativeDelta,
+          String branch,
+          List<CommitDataFiles> files
+  ) {
+      this.committedAt = committedAt;
+      this.message = message;
+      this.committer = committer;
+      this.positiveDelta = positiveDelta;
+      this.negativeDelta = negativeDelta;
+      this.branch = branch;
+      this.files = files;
+  }
 
   public CommitData committedAt(BigDecimal committedAt) {
     this.committedAt = committedAt;
@@ -100,7 +118,7 @@ public class CommitData   {
     this.committer = committer;
   }
 
-  public CommitData positiveDelta(BigDecimal positiveDelta) {
+  public CommitData positiveDelta(int positiveDelta) {
     this.positiveDelta = positiveDelta;
     return this;
   }
@@ -113,15 +131,15 @@ public class CommitData   {
 
   @Valid
 
-  public BigDecimal getPositiveDelta() {
+  public int getPositiveDelta() {
     return positiveDelta;
   }
 
-  public void setPositiveDelta(BigDecimal positiveDelta) {
+  public void setPositiveDelta(int positiveDelta) {
     this.positiveDelta = positiveDelta;
   }
 
-  public CommitData negativeDelta(BigDecimal negativeDelta) {
+  public CommitData negativeDelta(int negativeDelta) {
     this.negativeDelta = negativeDelta;
     return this;
   }
@@ -134,11 +152,11 @@ public class CommitData   {
 
   @Valid
 
-  public BigDecimal getNegativeDelta() {
+  public int getNegativeDelta() {
     return negativeDelta;
   }
 
-  public void setNegativeDelta(BigDecimal negativeDelta) {
+  public void setNegativeDelta(int negativeDelta) {
     this.negativeDelta = negativeDelta;
   }
 

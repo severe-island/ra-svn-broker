@@ -9,10 +9,6 @@ host: localhost:3003
 schemes:
   - http
   - https
-consumes:
-  - application/x-www-form-urlencoded
-produces:
-  - application/json
 paths:
   /repositories:
     post:
@@ -95,7 +91,7 @@ paths:
         '404':
           description: Not Found
 
-  /repositories/{id}/commit/{commit_id}:
+  /repositories/{id}/commits/{commit_id}:
     get:
       summary: Returns simple commit.
       parameters:
