@@ -1,30 +1,40 @@
 # SVN-broker
 
 ## Requirement
+
 * Java v.9.0.1 (or highter)
 * Gradle v.4.3.1 (or highter)
 
 ## Building
+
 Command for build:
+
 ``` bash
 gradle build
 ```
 
 ## Running
+
 Commands for run (Windows and Linux):
+
 ``` bash
 svn-broker
 ```
 
 ## Using
+
 The REST-service schema is in /specs/service.yaml (Swagger-compatible).
 
 ### Warning!
+
 Using POST-requests for /repositories requires the HTTP-headers:
-```
+
+``` http
 Content-Type: multipart/form-data; boundary=HereGoes
 ```
+
 Curl example:
+
 ``` bash
 curl -F "url=http://svn.example.org/code" \
     -F "login=john_cena" \
