@@ -1,5 +1,6 @@
 package org.repoaggr.svnbrk.api;
 
+import org.repoaggr.svnbrk.controller.MainController;
 import org.repoaggr.svnbrk.model.Branch;
 import org.repoaggr.svnbrk.model.Commit;
 import java.util.List;
@@ -57,7 +58,7 @@ public class RepositoriesApiController implements RepositoriesApi {
 
     public ResponseEntity<Overview> repositoriesIdGet(
             @ApiParam(value = "",required=true ) @PathVariable("id") String id) {
-        return RemoteSvnController.getOverview(id);
+        return MainController.getOverview(id);
     }
 
     public ResponseEntity<RegistrationStatus> repositoriesPost(
@@ -65,7 +66,7 @@ public class RepositoriesApiController implements RepositoriesApi {
             @ApiParam(value = "", required=true) @RequestPart(value="id", required=true)  String id,
             @ApiParam(value = "") @RequestPart(value="login", required=false)  String login,
             @ApiParam(value = "") @RequestPart(value="password", required=false)  String password) {
-        return RemoteSvnController.postRegistrationStatus(url, login, password, id);
+        return MainController.postRegistrationStatus(url, login, password, id);
     }
 
 }

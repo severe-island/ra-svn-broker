@@ -1,5 +1,6 @@
 package org.repoaggr.svnbrk.model;
 
+import java.io.Serializable;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -14,7 +15,7 @@ import javax.validation.constraints.*;
  */
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-09T09:35:53.477Z")
 
-public class OverviewData   {
+public class OverviewData implements Serializable {
   @JsonProperty("last_sych_date")
   private BigDecimal lastSychDate = null;
 
@@ -26,6 +27,9 @@ public class OverviewData   {
 
   @JsonProperty("size")
   private BigDecimal size = null;
+
+  private String login = null;
+  private String password = null;
 
   public OverviewData(
           BigDecimal lastSychDate,
@@ -122,7 +126,25 @@ public class OverviewData   {
   }
 
 
-  @Override
+  // Получение логина и пароля ------------------------------------------------
+    public String getLogin() {
+        return login;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    // Задание логина и пароля ------------------------------------------------
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    @Override
   public boolean equals(java.lang.Object o) {
     if (this == o) {
       return true;

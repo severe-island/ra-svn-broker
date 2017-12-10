@@ -1,5 +1,6 @@
 package org.repoaggr.svnbrk.model;
 
+import java.io.Serializable;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -15,7 +16,7 @@ import javax.validation.constraints.*;
 @ApiModel(description = "A representation of some SVN-repository")
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-09T09:35:53.477Z")
 
-public class Overview   {
+public class Overview implements Serializable {
   @JsonProperty("status")
   private String status = null;
 

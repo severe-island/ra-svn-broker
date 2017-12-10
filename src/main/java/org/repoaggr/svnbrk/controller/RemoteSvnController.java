@@ -3,6 +3,8 @@ package org.repoaggr.svnbrk.controller;
 import org.repoaggr.svnbrk.model.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.tmatesoft.svn.core.SVNDirEntry;
+import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
@@ -11,55 +13,79 @@ import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.joda.time.DateTime;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 public final class RemoteSvnController {
     private RemoteSvnController() { }
 
-    // Регистрация репозитория в сервисе --------------------------------------
-    public static ResponseEntity<RegistrationStatus> postRegistrationStatus(
-            String url, String login, String password, String id) {
-        try {
-            SVNRepository repository = SVNRepositoryFactory
-                    .create(SVNURL.parseURIEncoded(url));
+    // Служебное --------------------------------------------------------------
+    // Подготовка репозитория
+    private static SVNRepository getRepository(
+            String url, String login, String password)
+        throws SVNException
+    {
+        SVNRepository repository = SVNRepositoryFactory
+                .create(SVNURL.parseURIEncoded(url));
 
-            // Аутентификация
-            if(!login.isEmpty() || !password.isEmpty()) {
-                ISVNAuthenticationManager authenticationManager =
-                        SVNWCUtil.createDefaultAuthenticationManager(
-                                login, password
-                        );
-                repository.setAuthenticationManager(authenticationManager);
-            }
-            repository.testConnection();
-            // сюда докинуть логику кэширования
-            return new ResponseEntity<RegistrationStatus>(
-                    new RegistrationStatus("success", "success"),
-                    HttpStatus.CREATED
-            );
-        } catch(SVNException e) {
-            return new ResponseEntity<RegistrationStatus>(
-                    new RegistrationStatus("failure", e.getMessage()),
-                    HttpStatus.FORBIDDEN
-            );
+        // Аутентификация
+        if(!login.isEmpty() || !password.isEmpty()) {
+            ISVNAuthenticationManager authenticationManager =
+                    SVNWCUtil.createDefaultAuthenticationManager(
+                            login, password
+                    );
+            repository.setAuthenticationManager(authenticationManager);
         }
+        return repository;
+    }
+
+    // Получение размера директории репозитория
+    private static long getSize(SVNRepository repository) throws SVNException {
+        return getSize(repository, "/");
+    }
+
+    private static long getSize(SVNRepository repository, String path)
+            throws SVNException {
+        long size = 0;
+        Collection entries = repository.getDir(path, -1, null, (Collection)null);
+        Iterator iterator = entries.iterator();
+        while (iterator.hasNext()) {
+            SVNDirEntry entry = (SVNDirEntry) iterator.next();
+            if ( entry.getKind() == SVNNodeKind.DIR) {
+                size += getSize(repository,
+                        (path.equals(""))
+                                ? entry.getName()
+                                : path + "/" + entry.getName());
+            } else {
+                size += entry.getSize();
+            }
+        }
+        return size;
+    }
+
+    public static BigDecimal getLastSyncDate() {
+        return new BigDecimal(0);
     }
 
     // Обзор репозитория ------------------------------------------------------
-    public static ResponseEntity<Overview> getOverview(String id) {
-        // ЗАГЛУШКА!
-        Overview overview = new Overview("success", "success");
+    public static Overview getOverview(String url, String login, String password)
+        throws SVNException
+    {
+        SVNRepository repository = getRepository(url, login, password);
         OverviewData data = new OverviewData(
                 new BigDecimal(Clock.systemDefaultZone().millis()),
                 "svn",
-                "xep",
-                new BigDecimal(0)
+                url,
+                new BigDecimal(getSize(repository))
         );
+        Overview overview = new Overview("success", "success");
         overview.setData(data);
-        return new ResponseEntity<Overview>(overview, HttpStatus.OK);
+        return overview;
     }
 
     // Список коммитов --------------------------------------------------------
