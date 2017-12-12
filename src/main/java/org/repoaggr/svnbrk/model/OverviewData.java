@@ -28,9 +28,6 @@ public class OverviewData implements Serializable {
   @JsonProperty("size")
   private BigDecimal size = null;
 
-  private String login = null;
-  private String password = null;
-
   public OverviewData(
           BigDecimal lastSychDate,
           String repoType,
@@ -124,25 +121,6 @@ public class OverviewData implements Serializable {
   public void setSize(BigDecimal size) {
     this.size = size;
   }
-
-
-  // Получение логина и пароля ------------------------------------------------
-    public String getLogin() {
-        return login;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    // Задание логина и пароля ------------------------------------------------
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     @Override
   public boolean equals(java.lang.Object o) {

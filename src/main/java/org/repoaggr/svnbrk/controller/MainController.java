@@ -1,6 +1,7 @@
 package org.repoaggr.svnbrk.controller;
 
 import com.sun.tools.internal.ws.wsdl.document.jaxws.Exception;
+import org.repoaggr.svnbrk.model.Meta;
 import org.repoaggr.svnbrk.model.Overview;
 import org.repoaggr.svnbrk.model.OverviewData;
 import org.repoaggr.svnbrk.model.RegistrationStatus;
@@ -20,19 +21,35 @@ import java.time.Clock;
 public final class MainController {
     private MainController() {}
 
+    private static final String CACHE_OVERVIEW = "overview";
+    private static final String CACHE_META = "_meta";
+
     // Регистрация репозитория в сервисе --------------------------------------
     public static ResponseEntity<RegistrationStatus> postRegistrationStatus(
             String url, String login, String password, String id)
     {
         try {
-            Overview overview = RemoteSvnController.getOverview(url, login, password);
-            overview.getData().setLogin(login);
-            overview.getData().setPassword(password);
-
+            // Если репозиторий уже зарегистрирован - вернуть ошибку.
             if(LocalCacheController.localExists(id))
                 throw new UnsupportedOperationException(
                         "Repository " + id + " is already registered.");
-            LocalCacheController.cachingOverview(id, overview);
+
+            // Получение обзора удалённого репозитория
+            Meta meta;
+            if(login != null && password != null) {
+                meta = new Meta(login, password);
+            }
+            else {
+                meta = new Meta("", "");
+            }
+            Overview overview = RemoteSvnController
+                    .getOverview(url, meta);
+
+            // Создание локальной записи
+            LocalCacheController
+                    .cachingObject(id, CACHE_OVERVIEW, overview);
+            LocalCacheController
+                    .cachingObject(id, CACHE_META, meta);
 
             return new ResponseEntity<RegistrationStatus>(
                     new RegistrationStatus("success", "success"),
@@ -59,18 +76,31 @@ public final class MainController {
     public static ResponseEntity<Overview> getOverview(String id)
     {
         try {
-            Overview cachedOverview = LocalCacheController.uncachingOverview(id);
+            // Вытягивается локальная копия обзора
+            Overview cachedOverview = (Overview) LocalCacheController
+                    .uncachingObject(id, CACHE_OVERVIEW);
+            Meta meta = (Meta) LocalCacheController
+                    .uncachingObject(id, CACHE_META);
 
-            // Если даты совпадают - используется локальная копия
+            // Если нет соединения, то используется локальная копия
+            if(!RemoteSvnController.isRemoteConnection(
+                    cachedOverview.getData().getUrl(),
+                    meta
+            )) {
+                cachedOverview.setStatus("warning");
+                cachedOverview.setReason("Cannot connect to remote repository. Cached data is used.");
+                return new ResponseEntity<Overview>(cachedOverview, HttpStatus.OK);
+            }
+            // Если даты совпадают, то используется локальная копия
             if (cachedOverview.getData().getLastSychDate()
                     .equals(RemoteSvnController.getLastSyncDate()))
                 return new ResponseEntity<Overview>(cachedOverview, HttpStatus.OK);
 
+
             // Иначе - вытягивается с репозитория
             Overview overview = RemoteSvnController.getOverview(
                     cachedOverview.getData().getUrl(),
-                    cachedOverview.getData().getLogin(),
-                    cachedOverview.getData().getPassword()
+                    meta
             );
             return new ResponseEntity<Overview>(overview, HttpStatus.OK);
         }

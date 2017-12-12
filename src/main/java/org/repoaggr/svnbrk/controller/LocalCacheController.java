@@ -34,22 +34,27 @@ public final class LocalCacheController {
         return Files.exists(dirPath(id));
     }
 
-    public static void cachingOverview(String id, Overview overview) throws IOException {
+    public static void cachingObject(String id, String filename, Object record)
+            throws IOException {
         Path dir = dirPath(id);
         if(!localExists(id)) {
             Files.createDirectories(dir);
         }
-        FileOutputStream fos = new FileOutputStream(overviewPath(dir));
+        FileOutputStream fos = new FileOutputStream(
+                dir.toString() + separator + filename
+        );
         ObjectOutputStream oos = new ObjectOutputStream(fos);
-        oos.writeObject(overview);
+        oos.writeObject(record);
         oos.flush();
         oos.close();
     }
-    public static Overview uncachingOverview(String id)
+    public static Object uncachingObject(String id, String filename)
             throws IOException, ClassNotFoundException
     {
-        FileInputStream fis = new FileInputStream(overviewPath(dirPath(id)));
+        FileInputStream fis = new FileInputStream(
+                dirPath(id) + separator + filename
+        );
         ObjectInputStream oin = new ObjectInputStream(fis);
-        return (Overview) oin.readObject();
+        return oin.readObject();
     }
 }

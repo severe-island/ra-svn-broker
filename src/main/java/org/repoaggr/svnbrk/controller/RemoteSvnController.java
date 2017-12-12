@@ -26,20 +26,28 @@ public final class RemoteSvnController {
 
     // Служебное --------------------------------------------------------------
     // Подготовка репозитория
-    private static SVNRepository getRepository(
-            String url, String login, String password)
+    private static SVNRepository getRepository(String url)
         throws SVNException
+    {
+        return SVNRepositoryFactory
+                .create(SVNURL.parseURIEncoded(url));
+    }
+
+    private static SVNRepository getRepository(
+            String url, Meta meta)
+            throws SVNException
     {
         SVNRepository repository = SVNRepositoryFactory
                 .create(SVNURL.parseURIEncoded(url));
 
         // Аутентификация
-        if(!login.isEmpty() || !password.isEmpty()) {
-            ISVNAuthenticationManager authenticationManager =
+        if(meta.authNeeds()) {
+            repository.setAuthenticationManager(
                     SVNWCUtil.createDefaultAuthenticationManager(
-                            login, password
-                    );
-            repository.setAuthenticationManager(authenticationManager);
+                            meta.getLogin(),
+                            meta.getPassword()
+                    )
+            );
         }
         return repository;
     }
@@ -68,15 +76,54 @@ public final class RemoteSvnController {
         return size;
     }
 
+    // ЗАКОНЧИТЬ!!!
     public static BigDecimal getLastSyncDate() {
         return new BigDecimal(0);
     }
 
+    // Тест соединения с удалённым репозиторием -------------------------------
+    public static boolean isRemoteConnection(String url) {
+        try {
+            SVNRepository repository = getRepository(url);
+            repository.testConnection();
+            return true;
+        } catch (SVNException e) {
+            return false;
+        }
+    }
+
+    public static boolean isRemoteConnection(
+            String url, Meta meta) {
+        try {
+            SVNRepository repository = getRepository(url, meta);
+            repository.testConnection();
+            return true;
+        } catch (SVNException e) {
+            return false;
+        }
+    }
+
     // Обзор репозитория ------------------------------------------------------
-    public static Overview getOverview(String url, String login, String password)
+    public static Overview getOverview(String url)
         throws SVNException
     {
-        SVNRepository repository = getRepository(url, login, password);
+        SVNRepository repository = getRepository(url);
+        OverviewData data = new OverviewData(
+                new BigDecimal(Clock.systemDefaultZone().millis()),
+                "svn",
+                url,
+                new BigDecimal(getSize(repository))
+        );
+        Overview overview = new Overview("success", "success");
+        overview.setData(data);
+        return overview;
+    }
+
+    public static Overview getOverview(
+            String url, Meta meta)
+            throws SVNException
+    {
+        SVNRepository repository = getRepository(url, meta);
         OverviewData data = new OverviewData(
                 new BigDecimal(Clock.systemDefaultZone().millis()),
                 "svn",
