@@ -1,5 +1,6 @@
 package org.repoaggr.svnbrk.controller;
 
+import jdk.vm.ci.meta.MemoryAccessProvider;
 import org.repoaggr.svnbrk.model.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -76,13 +77,22 @@ public final class RemoteSvnController {
         return size;
     }
 
-    // ЗАКОНЧИТЬ!!!
-    public static BigDecimal getLastSyncDate() {
-        return new BigDecimal(0);
+    public static BigDecimal getLastSyncDate(String url, Meta meta) {
+        try {
+            SVNRepository repository = getRepository(url, meta);
+            return new BigDecimal(
+                    repository.info("/", repository.getLatestRevision())
+                            .getDate()
+                            .getTime()
+            );
+        }
+        catch (SVNException e) {
+            return BigDecimal.ZERO;
+        }
     }
 
     // Тест соединения с удалённым репозиторием -------------------------------
-    public static boolean isRemoteConnection(String url) {
+    /*public static boolean isRemoteConnection(String url) {
         try {
             SVNRepository repository = getRepository(url);
             repository.testConnection();
@@ -90,7 +100,7 @@ public final class RemoteSvnController {
         } catch (SVNException e) {
             return false;
         }
-    }
+    }*/
 
     public static boolean isRemoteConnection(
             String url, Meta meta) {
@@ -104,7 +114,7 @@ public final class RemoteSvnController {
     }
 
     // Обзор репозитория ------------------------------------------------------
-    public static Overview getOverview(String url)
+    /*public static Overview getOverview(String url)
         throws SVNException
     {
         SVNRepository repository = getRepository(url);
@@ -117,7 +127,7 @@ public final class RemoteSvnController {
         Overview overview = new Overview("success", "success");
         overview.setData(data);
         return overview;
-    }
+    }*/
 
     public static Overview getOverview(
             String url, Meta meta)
@@ -125,7 +135,10 @@ public final class RemoteSvnController {
     {
         SVNRepository repository = getRepository(url, meta);
         OverviewData data = new OverviewData(
-                new BigDecimal(Clock.systemDefaultZone().millis()),
+                new BigDecimal(repository.info("/", repository.getLatestRevision())
+                        .getDate()
+                        .getTime()
+                ),
                 "svn",
                 url,
                 new BigDecimal(getSize(repository))

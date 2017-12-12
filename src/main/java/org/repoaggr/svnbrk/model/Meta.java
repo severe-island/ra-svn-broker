@@ -1,10 +1,14 @@
 package org.repoaggr.svnbrk.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.Clock;
 
 public class Meta implements Serializable {
     private String login = "";
     private String password = "";
+    private BigDecimal last_sync_date =
+            new BigDecimal(Clock.systemDefaultZone().millis());
 
     public Meta(String login, String password) {
         this.login = login;
@@ -19,6 +23,14 @@ public class Meta implements Serializable {
 
     public String getPassword() {
         return password;
+    }
+
+    public BigDecimal getLast_sync_date() {
+        return last_sync_date;
+    }
+
+    public void setLast_sync_date(BigDecimal last_sync_date) {
+        this.last_sync_date = last_sync_date;
     }
 
     public boolean authNeeds() {

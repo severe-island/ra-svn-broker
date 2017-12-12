@@ -24,6 +24,12 @@ public final class MainController {
     private static final String CACHE_OVERVIEW = "overview";
     private static final String CACHE_META = "_meta";
 
+    // Обновление даты синхронизации ------------------------------------------
+    private static void updateMetadata(String id, Meta meta) throws IOException {
+        meta.setLast_sync_date(new BigDecimal(Clock.systemDefaultZone().millis()));
+        LocalCacheController.cachingObject(id, CACHE_META, meta);
+    }
+
     // Регистрация репозитория в сервисе --------------------------------------
     public static ResponseEntity<RegistrationStatus> postRegistrationStatus(
             String url, String login, String password, String id)
@@ -82,26 +88,29 @@ public final class MainController {
             Meta meta = (Meta) LocalCacheController
                     .uncachingObject(id, CACHE_META);
 
+            // Возвращается 0, если не удалось соединиться.
+            BigDecimal lastRevisionDate = RemoteSvnController
+                    .getLastSyncDate(cachedOverview.getData().getUrl(), meta);
             // Если нет соединения, то используется локальная копия
-            if(!RemoteSvnController.isRemoteConnection(
-                    cachedOverview.getData().getUrl(),
-                    meta
-            )) {
+            if(lastRevisionDate.equals(BigDecimal.ZERO)) {
                 cachedOverview.setStatus("warning");
                 cachedOverview.setReason("Cannot connect to remote repository. Cached data is used.");
                 return new ResponseEntity<Overview>(cachedOverview, HttpStatus.OK);
             }
             // Если даты совпадают, то используется локальная копия
             if (cachedOverview.getData().getLastSychDate()
-                    .equals(RemoteSvnController.getLastSyncDate()))
+                    .equals(lastRevisionDate)) {
+                updateMetadata(id, meta);
                 return new ResponseEntity<Overview>(cachedOverview, HttpStatus.OK);
-
+            }
 
             // Иначе - вытягивается с репозитория
+            updateMetadata(id, meta);
             Overview overview = RemoteSvnController.getOverview(
                     cachedOverview.getData().getUrl(),
                     meta
             );
+
             return new ResponseEntity<Overview>(overview, HttpStatus.OK);
         }
         catch (SVNException e) {
