@@ -1,10 +1,7 @@
 package org.repoaggr.svnbrk.controller;
 
 import com.sun.tools.internal.ws.wsdl.document.jaxws.Exception;
-import org.repoaggr.svnbrk.model.Meta;
-import org.repoaggr.svnbrk.model.Overview;
-import org.repoaggr.svnbrk.model.OverviewData;
-import org.repoaggr.svnbrk.model.RegistrationStatus;
+import org.repoaggr.svnbrk.model.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.tmatesoft.svn.core.SVNException;
@@ -14,13 +11,17 @@ import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Clock;
 
 public final class MainController {
     private MainController() {}
 
+    private static final String CACHE_TEMP = "temp";
     private static final String CACHE_OVERVIEW = "overview";
     private static final String CACHE_META = "_meta";
 
@@ -43,13 +44,13 @@ public final class MainController {
             // Получение обзора удалённого репозитория
             Meta meta;
             if(login != null && password != null) {
-                meta = new Meta(login, password);
+                meta = new Meta(url, login, password);
             }
             else {
-                meta = new Meta("", "");
+                meta = new Meta(url,"", "");
             }
             Overview overview = RemoteSvnController
-                    .getOverview(url, meta);
+                    .getOverview(meta);
 
             // Создание локальной записи
             LocalCacheController
@@ -90,7 +91,7 @@ public final class MainController {
 
             // Возвращается 0, если не удалось соединиться.
             BigDecimal lastRevisionDate = RemoteSvnController
-                    .getLastSyncDate(cachedOverview.getData().getUrl(), meta);
+                    .getLastSyncDate(meta);
             // Если нет соединения, то используется локальная копия
             if(lastRevisionDate.equals(BigDecimal.ZERO)) {
                 cachedOverview.setStatus("warning");
@@ -106,10 +107,7 @@ public final class MainController {
 
             // Иначе - вытягивается с репозитория
             updateMetadata(id, meta);
-            Overview overview = RemoteSvnController.getOverview(
-                    cachedOverview.getData().getUrl(),
-                    meta
-            );
+            Overview overview = RemoteSvnController.getOverview(meta);
 
             return new ResponseEntity<Overview>(overview, HttpStatus.OK);
         }
@@ -132,6 +130,36 @@ public final class MainController {
         catch (ClassNotFoundException e) {
             return new ResponseEntity<Overview>(
                     new Overview("failure", e.getMessage()),
+                    HttpStatus.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    // Данные по коммиту ------------------------------------------------------
+    public static ResponseEntity<Commit> getCommit(String repoId, String commitId) {
+        try {
+            Commit commit = new Commit("success", "success");
+            Meta meta = (Meta) LocalCacheController.uncachingObject(repoId, CACHE_META);
+            RemoteSvnController.downloadCommit(meta, commitId,
+                    LocalCacheController.dirTemp(repoId, CACHE_TEMP));
+            CommitData data = LocalCacheController.parseCommitFile(repoId, CACHE_TEMP);
+            Files.delete(Paths.get(LocalCacheController.dirTemp(repoId, CACHE_TEMP)));
+            // ДОБАВИТЬ ФЛАГИ И РАЗМЕРЫ ФАЙЛОВ!!!
+            commit.setData(data);
+            return new ResponseEntity<Commit>(
+                    commit,
+                    HttpStatus.OK
+            );
+        }
+        catch (SVNException e) {
+            return new ResponseEntity<Commit>(
+                    new Commit("failure", e.getMessage()),
+                    HttpStatus.FORBIDDEN
+            );
+        }
+        catch (IOException | ClassNotFoundException e) {
+            return new ResponseEntity<Commit>(
+                    new Commit("failure", e.getMessage()),
                     HttpStatus.INTERNAL_SERVER_ERROR
             );
         }

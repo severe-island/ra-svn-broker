@@ -48,7 +48,7 @@ public class RepositoriesApiController implements RepositoriesApi {
     public ResponseEntity<Commit> repositoriesIdCommitCommitIdGet(
             @ApiParam(value = "",required=true ) @PathVariable("id") String id,
             @ApiParam(value = "",required=true ) @PathVariable("commit_id") String commitId) {
-        return RemoteSvnController.getCommit(id, commitId);
+        return MainController.getCommit(id, commitId);
     }
 
     public ResponseEntity<List> repositoriesIdCommitsGet(

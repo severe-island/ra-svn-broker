@@ -1,6 +1,8 @@
 package org.repoaggr.svnbrk.controller;
 
 import com.sun.deploy.util.SystemUtils;
+import org.repoaggr.svnbrk.model.CommitData;
+import org.repoaggr.svnbrk.model.CommitDataFiles;
 import org.repoaggr.svnbrk.model.Overview;
 
 import java.io.*;
@@ -10,6 +12,10 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Clock;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public final class LocalCacheController {
     private LocalCacheController() {
@@ -26,9 +32,46 @@ public final class LocalCacheController {
         return Paths.get("cache" + separator + id);
     }
 
-    private static String overviewPath(Path dir) {
-        return dir.toString() + separator + "overview";
+    public static String dirTemp(String id, String tempPath) {
+        return dirPath(id) + separator + tempPath;
     }
+
+    public static CommitData parseCommitFile(String id, String tempPath)
+            throws IOException
+    {
+        int positiveDelta = 0;
+        int negaitveDelta = 0;
+        Pattern p_titles = Pattern.compile("\\+\\+\\+.*\\(.*\\)"); // Поиск названий файлов
+        Pattern p_deltas = Pattern.compile("@@.*@@"); // Поиск строки дельт
+        Pattern p_positiveDelta = Pattern.compile("\\+\\d+(,\\d+)*");   // Поиск положительной дельты
+        Pattern p_negativeDelta = Pattern.compile("-\\d+(,\\d+)*"); // Поиск отрицательной дельты
+        List<CommitDataFiles> files = new ArrayList<CommitDataFiles>();
+        for(String line : Files.readAllLines(Paths.get(dirPath(id) + separator + tempPath))){
+            if(p_titles.matcher(line).matches()) {
+                files.add(new CommitDataFiles(line.split(" |\t")[1]));
+            }
+            else if(p_deltas.matcher(line).matches()) {
+                Matcher m_positiveDelta = p_positiveDelta.matcher(line);
+                Matcher m_negativeDelta = p_negativeDelta.matcher(line);
+                if (m_positiveDelta.find()) {
+                    String[] temp = m_positiveDelta.group().split("\\+|,");
+                    int localPositiveDelta = temp.length == 2 ? 1 : Integer.valueOf(temp[2]);
+                    files.get(files.size() - 1).setPositiveDelta(localPositiveDelta);
+                    positiveDelta += localPositiveDelta;
+                }
+                if (m_negativeDelta.find()) {
+                    String[] temp = m_negativeDelta.group().split("-|,");
+                    int localNegativeDelta = temp.length == 2 ? 1 : Integer.valueOf(temp[2]);
+                    files.get(files.size() - 1).setNegativeDelta(localNegativeDelta);
+                    positiveDelta += localNegativeDelta;
+                }
+            }
+        }
+        return new CommitData(positiveDelta, negaitveDelta, files);
+    }
+    /*private static String overviewPath(Path dir) {
+        return dir.toString() + separator + "overview";
+    }*/
 
     public static boolean localExists(String id) {
         return Files.exists(dirPath(id));

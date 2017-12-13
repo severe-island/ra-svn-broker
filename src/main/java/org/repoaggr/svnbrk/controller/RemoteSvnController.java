@@ -4,16 +4,17 @@ import jdk.vm.ci.meta.MemoryAccessProvider;
 import org.repoaggr.svnbrk.model.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.tmatesoft.svn.core.SVNDirEntry;
-import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.*;
+import org.tmatesoft.svn.core.wc.SVNDiffClient;
+import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
-import org.tmatesoft.svn.core.SVNException;
-import org.tmatesoft.svn.core.SVNURL;
 import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.joda.time.DateTime;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -27,19 +28,11 @@ public final class RemoteSvnController {
 
     // Служебное --------------------------------------------------------------
     // Подготовка репозитория
-    private static SVNRepository getRepository(String url)
-        throws SVNException
-    {
-        return SVNRepositoryFactory
-                .create(SVNURL.parseURIEncoded(url));
-    }
-
-    private static SVNRepository getRepository(
-            String url, Meta meta)
+    private static SVNRepository getRepository(Meta meta)
             throws SVNException
     {
         SVNRepository repository = SVNRepositoryFactory
-                .create(SVNURL.parseURIEncoded(url));
+                .create(SVNURL.parseURIEncoded(meta.getUrl()));
 
         // Аутентификация
         if(meta.authNeeds()) {
@@ -77,9 +70,10 @@ public final class RemoteSvnController {
         return size;
     }
 
-    public static BigDecimal getLastSyncDate(String url, Meta meta) {
+    // Дата последнего коммита ------------------------------------------------
+    public static BigDecimal getLastSyncDate(Meta meta) {
         try {
-            SVNRepository repository = getRepository(url, meta);
+            SVNRepository repository = getRepository(meta);
             return new BigDecimal(
                     repository.info("/", repository.getLatestRevision())
                             .getDate()
@@ -91,56 +85,18 @@ public final class RemoteSvnController {
         }
     }
 
-    // Тест соединения с удалённым репозиторием -------------------------------
-    /*public static boolean isRemoteConnection(String url) {
-        try {
-            SVNRepository repository = getRepository(url);
-            repository.testConnection();
-            return true;
-        } catch (SVNException e) {
-            return false;
-        }
-    }*/
-
-    public static boolean isRemoteConnection(
-            String url, Meta meta) {
-        try {
-            SVNRepository repository = getRepository(url, meta);
-            repository.testConnection();
-            return true;
-        } catch (SVNException e) {
-            return false;
-        }
-    }
-
     // Обзор репозитория ------------------------------------------------------
-    /*public static Overview getOverview(String url)
-        throws SVNException
-    {
-        SVNRepository repository = getRepository(url);
-        OverviewData data = new OverviewData(
-                new BigDecimal(Clock.systemDefaultZone().millis()),
-                "svn",
-                url,
-                new BigDecimal(getSize(repository))
-        );
-        Overview overview = new Overview("success", "success");
-        overview.setData(data);
-        return overview;
-    }*/
-
-    public static Overview getOverview(
-            String url, Meta meta)
+    public static Overview getOverview(Meta meta)
             throws SVNException
     {
-        SVNRepository repository = getRepository(url, meta);
+        SVNRepository repository = getRepository(meta);
         OverviewData data = new OverviewData(
                 new BigDecimal(repository.info("/", repository.getLatestRevision())
                         .getDate()
                         .getTime()
                 ),
                 "svn",
-                url,
+                meta.getUrl(),
                 new BigDecimal(getSize(repository))
         );
         Overview overview = new Overview("success", "success");
@@ -163,7 +119,7 @@ public final class RemoteSvnController {
     public static ResponseEntity<Commit> getCommit(String repoId, String commitId) {
         // ЗАГЛУШКА!
         ArrayList<CommitDataFiles> files = new ArrayList<CommitDataFiles>();
-        files.add(new CommitDataFiles(
+        /*files.add(new CommitDataFiles(
                 1,
                 "A",
                 1,
@@ -176,7 +132,8 @@ public final class RemoteSvnController {
                 1,
                 0,
                 "y.cpp"
-        ));
+        ));*/
+        /*
         CommitData data = new CommitData(
                 new BigDecimal(Clock.systemDefaultZone().millis()),
                 "example",
@@ -185,11 +142,10 @@ public final class RemoteSvnController {
                 0,
                 "master",
                 files
-        );
+        );*/
         Commit commit = new Commit(
                 "success",
-                "success",
-                data
+                "success"
         );
         return new ResponseEntity<Commit>(commit, HttpStatus.OK);
     }
@@ -217,5 +173,29 @@ public final class RemoteSvnController {
         );
         Branch branch = new Branch("success", "success", data);
         return new ResponseEntity<Branch>(branch, HttpStatus.OK);
+    }
+
+    // Вытягивание данных по коммиту ------------------------------------------
+    public static void downloadCommit(Meta meta, String commitId, String tempPath)
+            throws SVNException, NumberFormatException, IOException
+    {
+        long revision = Long.valueOf(commitId);
+        long prerevision = revision - 1;
+        FileOutputStream temp = new FileOutputStream(tempPath);
+        SVNDiffClient diffClient = new SVNDiffClient(
+                SVNWCUtil.createDefaultAuthenticationManager(
+                        meta.getLogin(),
+                        meta.getPassword()
+                ), null
+        );
+        diffClient.doDiff(
+                SVNURL.parseURIEncoded(meta.getUrl()),
+                SVNRevision.create(prerevision),
+                SVNURL.parseURIEncoded(meta.getUrl()),
+                SVNRevision.create(revision),
+                SVNDepth.INFINITY,
+                true, temp
+        );
+        temp.close();
     }
 }

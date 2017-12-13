@@ -29,17 +29,7 @@ public class CommitDataFiles   {
   @JsonProperty("path")
   private String path = null;
 
-  public CommitDataFiles(
-          int size,
-          String flag,
-          int positiveDelta,
-          int negativeDelta,
-          String path
-  ) {
-      this.size = size;
-      this.flag = flag;
-      this.positiveDelta = positiveDelta;
-      this.negativeDelta = negativeDelta;
+  public CommitDataFiles(String path) {
       this.path = path;
   }
 

@@ -40,20 +40,21 @@ public class CommitData   {
   private List<CommitDataFiles> files = null;
 
   public CommitData(
-          BigDecimal committedAt,
+          /*BigDecimal committedAt,
           String message,
-          String committer,
+          String committer,*/
           int positiveDelta,
           int negativeDelta,
-          String branch,
+          //String branch,
           List<CommitDataFiles> files
   ) {
+    /*
       this.committedAt = committedAt;
       this.message = message;
-      this.committer = committer;
+      this.committer = committer;*/
       this.positiveDelta = positiveDelta;
       this.negativeDelta = negativeDelta;
-      this.branch = branch;
+      //this.branch = branch;
       this.files = files;
   }
 

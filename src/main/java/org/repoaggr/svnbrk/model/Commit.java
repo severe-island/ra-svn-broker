@@ -27,12 +27,10 @@ public class Commit   {
 
   public Commit(
           String status,
-          String reason,
-          CommitData data
+          String reason
   ) {
       this.status = status;
       this.reason = reason;
-      this.data = data;
   }
 
   public Commit status(String status) {
