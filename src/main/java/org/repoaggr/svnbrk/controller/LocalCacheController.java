@@ -7,6 +7,7 @@ import org.repoaggr.svnbrk.model.Overview;
 
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
@@ -40,15 +41,22 @@ public final class LocalCacheController {
             throws IOException
     {
         int positiveDelta = 0;
-        int negaitveDelta = 0;
+        int negativeDelta = 0;
         Pattern p_titles = Pattern.compile("\\+\\+\\+.*\\(.*\\)"); // Поиск названий файлов
         Pattern p_deltas = Pattern.compile("@@.*@@"); // Поиск строки дельт
         Pattern p_positiveDelta = Pattern.compile("\\+\\d+(,\\d+)*");   // Поиск положительной дельты
         Pattern p_negativeDelta = Pattern.compile("-\\d+(,\\d+)*"); // Поиск отрицательной дельты
         List<CommitDataFiles> files = new ArrayList<CommitDataFiles>();
-        for(String line : Files.readAllLines(Paths.get(dirPath(id) + separator + tempPath))){
+        //String temp = dirPath(id) + separator + tempPath;
+        BufferedReader reader = new BufferedReader(
+                new InputStreamReader(
+                        new FileInputStream(dirPath(id) + separator + tempPath),
+                        StandardCharsets.UTF_8)
+        );
+        String line;
+        while ((line = reader.readLine()) != null){
             if(p_titles.matcher(line).matches()) {
-                files.add(new CommitDataFiles(line.split(" |\t")[1]));
+                files.add(new CommitDataFiles(line.substring(4).split("\t")[0]));
             }
             else if(p_deltas.matcher(line).matches()) {
                 Matcher m_positiveDelta = p_positiveDelta.matcher(line);
@@ -63,11 +71,12 @@ public final class LocalCacheController {
                     String[] temp = m_negativeDelta.group().split("-|,");
                     int localNegativeDelta = temp.length == 2 ? 1 : Integer.valueOf(temp[2]);
                     files.get(files.size() - 1).setNegativeDelta(localNegativeDelta);
-                    positiveDelta += localNegativeDelta;
+                    negativeDelta += localNegativeDelta;
                 }
             }
         }
-        return new CommitData(positiveDelta, negaitveDelta, files);
+        reader.close();
+        return new CommitData(positiveDelta, negativeDelta, files);
     }
     /*private static String overviewPath(Path dir) {
         return dir.toString() + separator + "overview";

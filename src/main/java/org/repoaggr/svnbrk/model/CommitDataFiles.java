@@ -15,7 +15,7 @@ import javax.validation.constraints.*;
 
 public class CommitDataFiles   {
   @JsonProperty("size")
-  private int size = 0;
+  private long size = 0;
 
   @JsonProperty("flag")
   private String flag = null;
@@ -33,7 +33,7 @@ public class CommitDataFiles   {
       this.path = path;
   }
 
-  public CommitDataFiles size(int size) {
+  public CommitDataFiles size(long size) {
     this.size = size;
     return this;
   }
@@ -46,11 +46,11 @@ public class CommitDataFiles   {
 
   @Valid
 
-  public int getSize() {
+  public long getSize() {
     return size;
   }
 
-  public void setSize(int size) {
+  public void setSize(long size) {
     this.size = size;
   }
 

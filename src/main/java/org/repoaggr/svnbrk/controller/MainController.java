@@ -138,26 +138,25 @@ public final class MainController {
     // Данные по коммиту ------------------------------------------------------
     public static ResponseEntity<Commit> getCommit(String repoId, String commitId) {
         try {
-            Commit commit = new Commit("success", "success");
             Meta meta = (Meta) LocalCacheController.uncachingObject(repoId, CACHE_META);
             RemoteSvnController.downloadCommit(meta, commitId,
                     LocalCacheController.dirTemp(repoId, CACHE_TEMP));
             CommitData data = LocalCacheController.parseCommitFile(repoId, CACHE_TEMP);
-            Files.delete(Paths.get(LocalCacheController.dirTemp(repoId, CACHE_TEMP)));
-            // ДОБАВИТЬ ФЛАГИ И РАЗМЕРЫ ФАЙЛОВ!!!
-            commit.setData(data);
+            //Files.delete(Paths.get(LocalCacheController.dirTemp(repoId, CACHE_TEMP)));
             return new ResponseEntity<Commit>(
-                    commit,
+                    RemoteSvnController.getCommitInfo(meta, commitId, data),
                     HttpStatus.OK
             );
         }
         catch (SVNException e) {
+            e.printStackTrace();
             return new ResponseEntity<Commit>(
                     new Commit("failure", e.getMessage()),
                     HttpStatus.FORBIDDEN
             );
         }
         catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
             return new ResponseEntity<Commit>(
                     new Commit("failure", e.getMessage()),
                     HttpStatus.INTERNAL_SERVER_ERROR
