@@ -139,12 +139,15 @@ public final class MainController {
     public static ResponseEntity<Commit> getCommit(String repoId, String commitId) {
         try {
             Meta meta = (Meta) LocalCacheController.uncachingObject(repoId, CACHE_META);
+            CommitData data = RemoteSvnController.getCommitMetaData(meta, commitId);
             RemoteSvnController.downloadCommit(meta, commitId,
                     LocalCacheController.dirTemp(repoId, CACHE_TEMP));
-            CommitData data = LocalCacheController.parseCommitFile(repoId, CACHE_TEMP);
-            //Files.delete(Paths.get(LocalCacheController.dirTemp(repoId, CACHE_TEMP)));
+            data = LocalCacheController.parseCommitFile(repoId, CACHE_TEMP, data);
+            Files.delete(Paths.get(LocalCacheController.dirTemp(repoId, CACHE_TEMP)));
+            Commit commit = new Commit("success", "success");
+            commit.setData(data);
             return new ResponseEntity<Commit>(
-                    RemoteSvnController.getCommitInfo(meta, commitId, data),
+                    commit,
                     HttpStatus.OK
             );
         }

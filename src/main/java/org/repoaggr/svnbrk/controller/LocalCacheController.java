@@ -37,7 +37,7 @@ public final class LocalCacheController {
         return dirPath(id) + separator + tempPath;
     }
 
-    public static CommitData parseCommitFile(String id, String tempPath)
+    public static CommitData parseCommitFile(String id, String tempPath, CommitData data)
             throws IOException
     {
         int positiveDelta = 0;
@@ -46,7 +46,7 @@ public final class LocalCacheController {
         Pattern p_deltas = Pattern.compile("@@.*@@"); // Поиск строки дельт
         Pattern p_positiveDelta = Pattern.compile("\\+\\d+(,\\d+)*");   // Поиск положительной дельты
         Pattern p_negativeDelta = Pattern.compile("-\\d+(,\\d+)*"); // Поиск отрицательной дельты
-        List<CommitDataFiles> files = new ArrayList<CommitDataFiles>();
+        //List<CommitDataFiles> files = new ArrayList<CommitDataFiles>();
         //String temp = dirPath(id) + separator + tempPath;
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(
@@ -54,29 +54,42 @@ public final class LocalCacheController {
                         StandardCharsets.UTF_8)
         );
         String line;
+        boolean fileIsChanged = false;
+        int lastIndex = 0;
         while ((line = reader.readLine()) != null){
             if(p_titles.matcher(line).matches()) {
-                files.add(new CommitDataFiles(line.substring(4).split("\t")[0]));
+                String name = "/" + line.substring(4).split("\t")[0];
+                for (CommitDataFiles file : data.getFiles()) {
+                    if(file.getPath().equals(name)) {
+                        fileIsChanged = true;
+                        lastIndex = data.getFiles().indexOf(file);
+                    }
+                }
+                //files.add(new CommitDataFiles(line.substring(4).split("\t")[0]));
             }
-            else if(p_deltas.matcher(line).matches()) {
+            else if(p_deltas.matcher(line).matches() && fileIsChanged) {
                 Matcher m_positiveDelta = p_positiveDelta.matcher(line);
                 Matcher m_negativeDelta = p_negativeDelta.matcher(line);
                 if (m_positiveDelta.find()) {
                     String[] temp = m_positiveDelta.group().split("\\+|,");
                     int localPositiveDelta = temp.length == 2 ? 1 : Integer.valueOf(temp[2]);
-                    files.get(files.size() - 1).setPositiveDelta(localPositiveDelta);
+                    data.getFiles().get(lastIndex).setPositiveDelta(localPositiveDelta);
                     positiveDelta += localPositiveDelta;
                 }
                 if (m_negativeDelta.find()) {
                     String[] temp = m_negativeDelta.group().split("-|,");
                     int localNegativeDelta = temp.length == 2 ? 1 : Integer.valueOf(temp[2]);
-                    files.get(files.size() - 1).setNegativeDelta(localNegativeDelta);
+                    data.getFiles().get(lastIndex).setNegativeDelta(localNegativeDelta);
                     negativeDelta += localNegativeDelta;
                 }
+                fileIsChanged = false;
             }
         }
         reader.close();
-        return new CommitData(positiveDelta, negativeDelta, files);
+        data.setPositiveDelta(positiveDelta);
+        data.setNegativeDelta(negativeDelta);
+        //data.setFiles(files);
+        return data;
     }
     /*private static String overviewPath(Path dir) {
         return dir.toString() + separator + "overview";

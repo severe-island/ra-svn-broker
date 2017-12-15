@@ -98,9 +98,9 @@ public final class RemoteSvnController {
             }
             for (Iterator iterator1 = entries.iterator(); iterator1.hasNext();) {
                 SVNDirEntry entry = ((SVNDirEntry) iterator1.next());
-                //System.out.println(entry.getName());
                 if((parent + entry.getName()).equals(file.getPath())){
-                    file.setSize(entry.getSize());
+                    if(!file.getFlag().equals("D"))
+                        file.setSize(entry.getSize());
                     break;
                 }
             }
@@ -212,6 +212,41 @@ public final class RemoteSvnController {
         return new ResponseEntity<Branch>(branch, HttpStatus.OK);
     }
 
+    public static CommitData getCommitMetaData(Meta meta, String commitId)
+        throws SVNException
+    {
+        long revision = Long.valueOf(commitId);
+        SVNRepository repository = getRepository(meta);
+        SVNLogEntry logEntry =(SVNLogEntry)repository.log(
+                new String[]{""},
+                null,
+                revision,
+                revision,
+                true,
+                true
+        ).iterator().next();
+        List<CommitDataFiles> files = new ArrayList<>();
+        logEntry.getChangedPaths().keySet().forEach(
+                path -> {
+                    if(logEntry.getChangedPaths().get(path).getKind()
+                            == SVNNodeKind.FILE) {
+                        files.add(new CommitDataFiles(
+                                path, "" + logEntry
+                                .getChangedPaths().get(path).getType()
+                        ));
+                    }
+                }
+        );
+        CommitData data = new CommitData(
+                logEntry.getAuthor(),
+                logEntry.getMessage(),
+                new BigDecimal(logEntry.getDate().getTime()),
+                files
+        );
+        fillFileSizes(repository, data, revision);
+        return data;
+    }
+
     // Вытягивание данных по коммиту ------------------------------------------
     public static Commit getCommitInfo(Meta meta, String commitId, CommitData data)
         throws SVNException
@@ -222,16 +257,14 @@ public final class RemoteSvnController {
         data.getFiles().forEach(item -> l_filenames.add(item.getPath()));
         String[] a_filenames = new String[l_filenames.size()];
 
-        //SVNLogEntry logEntry = (SVNLogEntry)
-        Iterator iter = repository.log(
+        SVNLogEntry logEntry = (SVNLogEntry) repository.log(
                 l_filenames.toArray(a_filenames),
                 null,
                 revision,
                 revision,
                 true,
                 true
-        ).iterator();//.next();
-        SVNLogEntry logEntry = (SVNLogEntry) iter.next();
+        ).iterator().next();
         data.setCommitter(logEntry.getAuthor());
         data.setMessage(logEntry.getMessage());
         data.setCommittedAt(new BigDecimal(logEntry.getDate().getTime()));

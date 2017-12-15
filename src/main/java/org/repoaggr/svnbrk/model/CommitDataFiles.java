@@ -32,6 +32,10 @@ public class CommitDataFiles   {
   public CommitDataFiles(String path) {
       this.path = path;
   }
+  public CommitDataFiles(String path, String flag) {
+      this.path = path;
+      this.flag = flag;
+  }
 
   public CommitDataFiles size(long size) {
     this.size = size;

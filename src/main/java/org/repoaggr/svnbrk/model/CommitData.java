@@ -58,6 +58,18 @@ public class CommitData   {
       this.files = files;
   }
 
+  public CommitData(
+          String committer,
+          String message,
+          BigDecimal committedAt,
+          List<CommitDataFiles> files
+  ) {
+      this.committer = committer;
+      this.message = message;
+      this.committedAt = committedAt;
+      this.files = files;
+  }
+
   public CommitData committedAt(BigDecimal committedAt) {
     this.committedAt = committedAt;
     return this;
