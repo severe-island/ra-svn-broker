@@ -23,7 +23,7 @@ import java.util.*;
 public final class RemoteSvnController {
     private RemoteSvnController() { }
 
-    // Служебное --------------------------------------------------------------
+    // Служебное ==============================================================
     // Подготовка репозитория
     private static SVNRepository getRepository(Meta meta)
             throws SVNException
@@ -44,7 +44,7 @@ public final class RemoteSvnController {
     }
 
     // Получение размера директории репозитория
-    private static long getSize(SVNRepository repository) throws SVNException {
+    public static long getSize(SVNRepository repository) throws SVNException {
         // СДЕЛАТЬ РАСЧЁТ РАЗМЕРА АСИНХРОННЫМ!
         return getSize(repository, "/");
     }
@@ -62,6 +62,7 @@ public final class RemoteSvnController {
                                 ? entry.getName()
                                 : path + "/" + entry.getName());
             } else {
+                //System.out.println(size);
                 size += entry.getSize();
             }
         }
@@ -80,8 +81,21 @@ public final class RemoteSvnController {
     private static boolean isParent(String path, String parent) {
         return parent.equals(getParent(path));
     }
+    private static boolean branchesFolderExist(SVNRepository repository) throws SVNException {
+        Iterator iterator = repository.getDir(
+                "/",
+                repository.getLatestRevision(),
+                null,
+                (Collection)null
+        ).iterator();
+        for (iterator = iterator; iterator.hasNext();) {
+            if (((SVNDirEntry)iterator.next()).getName().equals("branches"))
+                return true;
+        }
+        return false;
+    }
 
-    // Заполнение объекта CommitData размерами файлов
+    // Заполнение объекта CommitData размерами файлов -------------------------
     private static void fillFileSizes(
             SVNRepository repository, CommitData data, long revision)
             throws SVNException
@@ -123,7 +137,7 @@ public final class RemoteSvnController {
     }
 
     // Обзор репозитория ------------------------------------------------------
-    public static Overview getOverview(Meta meta)
+    public static Overview getOverview(String id, Meta meta)
             throws SVNException
     {
         SVNRepository repository = getRepository(meta);
@@ -134,84 +148,17 @@ public final class RemoteSvnController {
                 ),
                 "svn",
                 meta.getUrl(),
-                new BigDecimal(getSize(repository))
+                //new BigDecimal(getSize(repository))
+                BigDecimal.ZERO
         );
-        Overview overview = new Overview("success", "success");
+        //Overview overview = new Overview("success", "success");
+        Overview overview = new Overview("warning", "Size is calculating. Please, wait.");
         overview.setData(data);
+        AsyncLocalRemoteController.asyncGetRepositorySize(id, repository);
         return overview;
     }
 
-    // Список коммитов --------------------------------------------------------
-    public static ResponseEntity<List> getCommitsList(String id) {
-        // ЗАГЛУШКА!
-        ArrayList list = new ArrayList<String>();
-        list.add("r111");
-        list.add("r112");
-        list.add("r113");
-        list.add("r114");
-        return new ResponseEntity<List>(list, HttpStatus.OK);
-    }
-
-    // Данные по коммиту ------------------------------------------------------
-    public static ResponseEntity<Commit> getCommit(String repoId, String commitId) {
-        // ЗАГЛУШКА!
-        ArrayList<CommitDataFiles> files = new ArrayList<CommitDataFiles>();
-        /*files.add(new CommitDataFiles(
-                1,
-                "A",
-                1,
-                0,
-                "x.cpp"
-        ));
-        files.add(new CommitDataFiles(
-                1,
-                "A",
-                1,
-                0,
-                "y.cpp"
-        ));*/
-        /*
-        CommitData data = new CommitData(
-                new BigDecimal(Clock.systemDefaultZone().millis()),
-                "example",
-                "Mario",
-                2,
-                0,
-                "master",
-                files
-        );*/
-        Commit commit = new Commit(
-                "success",
-                "success"
-        );
-        return new ResponseEntity<Commit>(commit, HttpStatus.OK);
-    }
-
-    // Список веток -----------------------------------------------------------
-    public static ResponseEntity<List> getBranchesList(String id) {
-        // ЗАГЛУШКА!
-        ArrayList list = new ArrayList<String>();
-        list.add("master");
-        list.add("slave");
-        list.add("omega");
-        list.add("SPARTAAAAA!");
-        return new ResponseEntity<List>(list, HttpStatus.OK);
-    }
-
-    // Данные по ветке --------------------------------------------------------
-    public static ResponseEntity<Branch> getBranch(String repoId, String branchId) {
-        // ЗАГЛУШКА!
-        BranchData data = new BranchData(
-                "master",
-                "unlocked",
-                new BigDecimal(Clock.systemDefaultZone().millis()),
-                "r1",
-                "mario"
-        );
-        Branch branch = new Branch("success", "success", data);
-        return new ResponseEntity<Branch>(branch, HttpStatus.OK);
-    }
-
+    // Получение данных по коммиту (без дельт) --------------------------------
     public static CommitData getCommitMetaData(Meta meta, String commitId)
         throws SVNException
     {
@@ -247,54 +194,6 @@ public final class RemoteSvnController {
         return data;
     }
 
-    // Вытягивание данных по коммиту ------------------------------------------
-    public static Commit getCommitInfo(Meta meta, String commitId, CommitData data)
-        throws SVNException
-    {
-        long revision = Long.valueOf(commitId);
-        SVNRepository repository = getRepository(meta);
-        List<String> l_filenames = new ArrayList<>();
-        data.getFiles().forEach(item -> l_filenames.add(item.getPath()));
-        String[] a_filenames = new String[l_filenames.size()];
-
-        SVNLogEntry logEntry = (SVNLogEntry) repository.log(
-                l_filenames.toArray(a_filenames),
-                null,
-                revision,
-                revision,
-                true,
-                true
-        ).iterator().next();
-        data.setCommitter(logEntry.getAuthor());
-        data.setMessage(logEntry.getMessage());
-        data.setCommittedAt(new BigDecimal(logEntry.getDate().getTime()));
-        fillFileSizes(repository, data, revision);
-
-        /*for (int i = 0; i < data.getFiles().size(); i++) {
-            String p = "/" + data.getFiles().get(i).getPath();
-            SVNLogEntryPath path = logEntry
-                    .getChangedPaths()
-                    .get(p);
-            data.getFiles().get(i).setFlag("" + path.getType());
-        }*/
-
-        /*
-        logEntry.getChangedPaths().keySet().forEach(x -> System.out.println(x));
-        System.out.println("-----");
-        for (String name : logEntry.getChangedPaths().keySet()) {
-            SVNLogEntryPath file = logEntry.getChangedPaths().get(name);
-            System.out.println(file.getPath());
-            if(file.getCopyPath() != null)
-                System.out.println(file.getCopyPath());
-            //System.out.println(file.getPath());
-            //System.out.println(path.getPath());
-            //System.out.println("/" + file.getPath());
-        }*/
-        Commit commit = new Commit("success", "success");
-        commit.setData(data);
-        return commit;
-    }
-
     // Вытягивание данных по дельтам коммита ----------------------------------
     public static void downloadCommit(Meta meta, String commitId, String tempPath)
             throws SVNException, NumberFormatException, IOException
@@ -317,5 +216,60 @@ public final class RemoteSvnController {
                 true, temp
         );
         temp.close();
+    }
+
+    // Вытягивание данных по конкретной ветке ---------------------------------
+    public static Branch getBranch(Meta meta, String branchId) throws SVNException {
+        SVNRepository repository = getRepository(meta);
+        String path = "/branches/" + branchId;
+        SVNLogEntry logEntry = (SVNLogEntry) repository.log(
+                new String[] { path },
+                null,
+                0,
+                repository.getLatestRevision(),
+                false,
+                true
+        ).iterator().next();
+        String lock = ((SVNDirEntry)repository.getDir(
+                path,
+                logEntry.getRevision(),
+                null,
+                (Collection)null
+        ).iterator().next()).getLock() == null ? "unlocked" : "locked";
+        BranchData data = new BranchData(
+                branchId,
+                lock,
+                new BigDecimal(logEntry.getDate().getTime()),
+                String.valueOf(logEntry.getRevision()),
+                logEntry.getAuthor()
+        );
+        return new Branch("success", "success", data);
+    }
+
+    // Вытягивание списка веток -----------------------------------------------
+    public static BrokerList getBranchesList(Meta meta) throws SVNException {
+        SVNRepository repository = getRepository(meta);
+        List<String> list = new ArrayList<>();
+        list.add("trunk");
+        if(branchesFolderExist(repository)) {
+            repository.getDir(
+                    "/branches",
+                    repository.getLatestRevision(),
+                    null,
+                    (Collection) null
+            ).forEach(item -> list.add(((SVNDirEntry) item).getName()));
+        }
+        return new BrokerList("success", "success", list);
+    }
+
+    // Вытягивание списка коммитов --------------------------------------------
+    public static BrokerList getCommitsList(Meta meta) throws SVNException {
+        SVNRepository repository = getRepository(meta);
+        List<String> list = new ArrayList<>();
+        for(long i = 1; i <= repository.getLatestRevision(); i++) {
+            System.out.println(i);
+            list.add(String.valueOf(i));
+        }
+        return new BrokerList("success", "success", list);
     }
 }

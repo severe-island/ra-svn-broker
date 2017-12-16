@@ -35,13 +35,17 @@ public class RepositoriesApiController implements RepositoriesApi {
 
     public ResponseEntity<Branch> repositoriesIdBranchesBranchIdGet(
             @ApiParam(value = "",required=true ) @PathVariable("id") String id,
-            @ApiParam(value = "",required=true ) @PathVariable("branch_id") String branchId) {
-        return RemoteSvnController.getBranch(id, branchId);
+            @ApiParam(value = "",required=true ) @PathVariable("branch_id") String branchId)
+            throws SVNException, IOException, ClassNotFoundException
+    {
+        return MainController.getBranch(id, branchId);
     }
 
-    public ResponseEntity<List> repositoriesIdBranchesGet(
-            @ApiParam(value = "",required=true ) @PathVariable("id") String id) {
-        return RemoteSvnController.getBranchesList(id);
+    public ResponseEntity<BrokerList> repositoriesIdBranchesGet(
+            @ApiParam(value = "",required=true ) @PathVariable("id") String id)
+            throws SVNException, IOException, ClassNotFoundException
+    {
+        return MainController.getBranchesList(id);
     }
 
     public ResponseEntity<Commit> repositoriesIdCommitCommitIdGet(
@@ -52,9 +56,11 @@ public class RepositoriesApiController implements RepositoriesApi {
         return MainController.getCommit(id, commitId);
     }
 
-    public ResponseEntity<List> repositoriesIdCommitsGet(
-            @ApiParam(value = "",required=true ) @PathVariable("id") String id) {
-        return RemoteSvnController.getCommitsList(id);
+    public ResponseEntity<BrokerList> repositoriesIdCommitsGet(
+            @ApiParam(value = "",required=true ) @PathVariable("id") String id)
+            throws SVNException, IOException, ClassNotFoundException
+    {
+        return MainController.getCommitsList(id);
     }
 
     public ResponseEntity<Overview> repositoriesIdGet(

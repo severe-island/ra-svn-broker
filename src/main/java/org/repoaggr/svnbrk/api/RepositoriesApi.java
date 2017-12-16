@@ -37,7 +37,8 @@ public interface RepositoriesApi {
             method = RequestMethod.GET)
     ResponseEntity<Branch> repositoriesIdBranchesBranchIdGet(
             @ApiParam(value = "",required=true ) @PathVariable("id") String id,
-            @ApiParam(value = "",required=true ) @PathVariable("branch_id") String branchId);
+            @ApiParam(value = "",required=true ) @PathVariable("branch_id") String branchId)
+            throws SVNException, IOException, ClassNotFoundException;
 
 
     @ApiOperation(value = "Returns a list of branches.", notes = "", response = List.class, tags={  })
@@ -50,8 +51,9 @@ public interface RepositoriesApi {
     @RequestMapping(
             value = "/repositories/{id}/branches",
             method = RequestMethod.GET)
-    ResponseEntity<List> repositoriesIdBranchesGet(
-            @ApiParam(value = "",required=true ) @PathVariable("id") String id);
+    ResponseEntity<BrokerList> repositoriesIdBranchesGet(
+            @ApiParam(value = "",required=true ) @PathVariable("id") String id)
+            throws SVNException, IOException, ClassNotFoundException;
 
 
     @ApiOperation(value = "Returns simple commit.", notes = "", response = Commit.class, tags={  })
@@ -80,8 +82,9 @@ public interface RepositoriesApi {
     @RequestMapping(
             value = "/repositories/{id}/commits",
             method = RequestMethod.GET)
-    ResponseEntity<List> repositoriesIdCommitsGet(
-            @ApiParam(value = "",required=true ) @PathVariable("id") String id);
+    ResponseEntity<BrokerList> repositoriesIdCommitsGet(
+            @ApiParam(value = "",required=true ) @PathVariable("id") String id)
+            throws SVNException, IOException, ClassNotFoundException;
 
 
     @ApiOperation(value = "Returns a repository overview.", notes = "", response = Overview.class, tags={  })
@@ -115,9 +118,5 @@ public interface RepositoriesApi {
             @ApiParam(value = "") @RequestPart(value="login", required=false) String login,
             @ApiParam(value = "") @RequestPart(value="password", required=false) String password
     ) throws SVNException, IOException;
-
-    /*@ExceptionHandler(SVNException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorResponse handle(SVNException e);*/
 
 }
