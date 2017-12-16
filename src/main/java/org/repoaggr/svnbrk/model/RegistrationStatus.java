@@ -37,7 +37,7 @@ public class RegistrationStatus   {
   **/
   @ApiModelProperty(value = "")
 
- @Pattern(regexp="success|warning|failure")
+ @Pattern(regexp="success|warning")
   public String getStatus() {
     return status;
   }

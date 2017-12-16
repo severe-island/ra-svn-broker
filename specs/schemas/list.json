@@ -5,7 +5,7 @@
     "properties": {
         "status": {
             "type": "string",
-            "pattern": "success|warning|failure"
+            "pattern": "success|warning"
         },
         "reason": { "type": "string" },
         "data": {

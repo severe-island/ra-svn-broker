@@ -45,7 +45,7 @@ public class Commit   {
   @ApiModelProperty(required = true, value = "")
   @NotNull
 
- @Pattern(regexp="success|warning|failure")
+ @Pattern(regexp="success|warning")
   public String getStatus() {
     return status;
   }

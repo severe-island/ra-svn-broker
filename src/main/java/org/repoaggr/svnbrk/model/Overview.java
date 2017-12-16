@@ -43,7 +43,7 @@ public class Overview implements Serializable {
   @ApiModelProperty(required = true, value = "")
   @NotNull
 
- @Pattern(regexp="success|warning|failure")
+ @Pattern(regexp="success|warning")
   public String getStatus() {
     return status;
   }

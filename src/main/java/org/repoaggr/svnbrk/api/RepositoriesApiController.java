@@ -1,11 +1,10 @@
 package org.repoaggr.svnbrk.api;
 
 import org.repoaggr.svnbrk.controller.MainController;
-import org.repoaggr.svnbrk.model.Branch;
-import org.repoaggr.svnbrk.model.Commit;
+import org.repoaggr.svnbrk.model.*;
+
+import java.io.IOException;
 import java.util.List;
-import org.repoaggr.svnbrk.model.Overview;
-import org.repoaggr.svnbrk.model.RegistrationStatus;
 
 import io.swagger.annotations.*;
 
@@ -47,7 +46,9 @@ public class RepositoriesApiController implements RepositoriesApi {
 
     public ResponseEntity<Commit> repositoriesIdCommitCommitIdGet(
             @ApiParam(value = "",required=true ) @PathVariable("id") String id,
-            @ApiParam(value = "",required=true ) @PathVariable("commit_id") String commitId) {
+            @ApiParam(value = "",required=true ) @PathVariable("commit_id") String commitId)
+            throws SVNException, IOException, ClassNotFoundException
+    {
         return MainController.getCommit(id, commitId);
     }
 
@@ -57,7 +58,9 @@ public class RepositoriesApiController implements RepositoriesApi {
     }
 
     public ResponseEntity<Overview> repositoriesIdGet(
-            @ApiParam(value = "",required=true ) @PathVariable("id") String id) {
+            @ApiParam(value = "",required=true ) @PathVariable("id") String id)
+            throws SVNException, IOException, ClassNotFoundException
+    {
         return MainController.getOverview(id);
     }
 
@@ -65,8 +68,14 @@ public class RepositoriesApiController implements RepositoriesApi {
             @ApiParam(value = "", required=true) @RequestPart(value="url", required=true)  String url,
             @ApiParam(value = "", required=true) @RequestPart(value="id", required=true)  String id,
             @ApiParam(value = "") @RequestPart(value="login", required=false)  String login,
-            @ApiParam(value = "") @RequestPart(value="password", required=false)  String password) {
+            @ApiParam(value = "") @RequestPart(value="password", required=false)  String password)
+            throws SVNException, IOException
+    {
         return MainController.postRegistrationStatus(url, login, password, id);
     }
 
+    /*@Override
+    public ErrorResponse handle(SVNException e) {
+        return new ErrorResponse("failure", e.getMessage());
+    }*/
 }

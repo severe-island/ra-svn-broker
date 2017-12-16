@@ -5,22 +5,17 @@
  */
 package org.repoaggr.svnbrk.api;
 
-import org.repoaggr.svnbrk.model.Branch;
-import org.repoaggr.svnbrk.model.Commit;
+import org.repoaggr.svnbrk.model.*;
+
+import java.io.IOException;
 import java.util.List;
-import org.repoaggr.svnbrk.model.Overview;
-import org.repoaggr.svnbrk.model.RegistrationStatus;
 
 import io.swagger.annotations.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.tmatesoft.svn.core.SVNException;
 
 import java.util.List;
 import javax.validation.constraints.*;
@@ -34,7 +29,7 @@ public interface RepositoriesApi {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = Branch.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Branch.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = ErrorResponse.class),
         @ApiResponse(code = 404, message = "Not Found", response = Void.class) })
     
     @RequestMapping(
@@ -49,7 +44,7 @@ public interface RepositoriesApi {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = List.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = List.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = ErrorResponse.class),
         @ApiResponse(code = 404, message = "Not Found", response = Void.class) })
     
     @RequestMapping(
@@ -63,7 +58,7 @@ public interface RepositoriesApi {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = Commit.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Commit.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = ErrorResponse.class),
         @ApiResponse(code = 404, message = "Not Found", response = Void.class) })
     
     @RequestMapping(
@@ -71,14 +66,15 @@ public interface RepositoriesApi {
             method = RequestMethod.GET)
     ResponseEntity<Commit> repositoriesIdCommitCommitIdGet(
             @ApiParam(value = "",required=true ) @PathVariable("id") String id,
-            @ApiParam(value = "",required=true ) @PathVariable("commit_id") String commitId);
+            @ApiParam(value = "",required=true ) @PathVariable("commit_id") String commitId)
+            throws SVNException, IOException, ClassNotFoundException;
 
 
     @ApiOperation(value = "Returns a list of commits.", notes = "", response = List.class, tags={  })
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = List.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = List.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = ErrorResponse.class),
         @ApiResponse(code = 404, message = "Not Found", response = Void.class) })
     
     @RequestMapping(
@@ -92,13 +88,14 @@ public interface RepositoriesApi {
     @ApiResponses(value = { 
         @ApiResponse(code = 200, message = "OK", response = Overview.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = Overview.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = ErrorResponse.class),
         @ApiResponse(code = 404, message = "Not Found", response = Void.class) })
     
     @RequestMapping(
             value = "/repositories/{id}",
             method = RequestMethod.GET)
-    ResponseEntity<Overview> repositoriesIdGet(@ApiParam(value = "",required=true ) @PathVariable("id") String id);
+    ResponseEntity<Overview> repositoriesIdGet(@ApiParam(value = "",required=true ) @PathVariable("id") String id)
+            throws SVNException, IOException, ClassNotFoundException;
 
 
     @ApiOperation(value = "Register of repository.", notes = "Register of repository.",
@@ -106,7 +103,7 @@ public interface RepositoriesApi {
     @ApiResponses(value = { 
         @ApiResponse(code = 201, message = "Created", response = RegistrationStatus.class),
         @ApiResponse(code = 400, message = "Bad Request", response = Void.class),
-        @ApiResponse(code = 403, message = "Forbidden", response = RegistrationStatus.class),
+        @ApiResponse(code = 403, message = "Forbidden", response = ErrorResponse.class),
         @ApiResponse(code = 404, message = "Not Found", response = Void.class) })
     
     @RequestMapping(
@@ -117,6 +114,10 @@ public interface RepositoriesApi {
             @ApiParam(value = "", required=true) @RequestPart(value="id", required=true) String id,
             @ApiParam(value = "") @RequestPart(value="login", required=false) String login,
             @ApiParam(value = "") @RequestPart(value="password", required=false) String password
-    );
+    ) throws SVNException, IOException;
+
+    /*@ExceptionHandler(SVNException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorResponse handle(SVNException e);*/
 
 }

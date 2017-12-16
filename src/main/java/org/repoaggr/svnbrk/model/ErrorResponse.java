@@ -5,33 +5,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import org.repoaggr.svnbrk.model.BranchData;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
- * A representation of branch from SVN repo
+ * ErrorResponse
  */
-@ApiModel(description = "A representation of branch from SVN repo")
-@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-09T09:35:53.477Z")
+@javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-15T15:35:38.720Z")
 
-public class Branch   {
+public class ErrorResponse   {
   @JsonProperty("status")
   private String status = null;
 
   @JsonProperty("reason")
   private String reason = null;
 
-  @JsonProperty("data")
-  private BranchData data = null;
-
-  public Branch(String status, String reason, BranchData data) {
+  public ErrorResponse(String status, String reason) {
       this.status = status;
       this.reason = reason;
-      this.data = data;
   }
 
-  public Branch status(String status) {
+  public ErrorResponse status(String status) {
     this.status = status;
     return this;
   }
@@ -40,9 +34,10 @@ public class Branch   {
    * Get status
    * @return status
   **/
-  @ApiModelProperty(value = "")
+  @ApiModelProperty(required = true, value = "")
+  @NotNull
 
- @Pattern(regexp="success|warning")
+ @Pattern(regexp="failure")
   public String getStatus() {
     return status;
   }
@@ -51,7 +46,7 @@ public class Branch   {
     this.status = status;
   }
 
-  public Branch reason(String reason) {
+  public ErrorResponse reason(String reason) {
     this.reason = reason;
     return this;
   }
@@ -60,7 +55,8 @@ public class Branch   {
    * Get reason
    * @return reason
   **/
-  @ApiModelProperty(value = "")
+  @ApiModelProperty(required = true, value = "")
+  @NotNull
 
 
   public String getReason() {
@@ -69,27 +65,6 @@ public class Branch   {
 
   public void setReason(String reason) {
     this.reason = reason;
-  }
-
-  public Branch data(BranchData data) {
-    this.data = data;
-    return this;
-  }
-
-   /**
-   * Get data
-   * @return data
-  **/
-  @ApiModelProperty(value = "")
-
-  @Valid
-
-  public BranchData getData() {
-    return data;
-  }
-
-  public void setData(BranchData data) {
-    this.data = data;
   }
 
 
@@ -101,25 +76,23 @@ public class Branch   {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    Branch branch = (Branch) o;
-    return Objects.equals(this.status, branch.status) &&
-        Objects.equals(this.reason, branch.reason) &&
-        Objects.equals(this.data, branch.data);
+    ErrorResponse errorResponse = (ErrorResponse) o;
+    return Objects.equals(this.status, errorResponse.status) &&
+        Objects.equals(this.reason, errorResponse.reason);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(status, reason, data);
+    return Objects.hash(status, reason);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class Branch {\n");
+    sb.append("class ErrorResponse {\n");
     
     sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    reason: ").append(toIndentedString(reason)).append("\n");
-    sb.append("    data: ").append(toIndentedString(data)).append("\n");
     sb.append("}");
     return sb.toString();
   }

@@ -4,7 +4,7 @@ info:
   description: >-
     Web-service for collecting data from SVN-repositories and transfering it to
     repository-aggregator.
-  version: 0.0.2
+  version: 0.0.3
 host: localhost:3003
 schemes:
   - http
@@ -43,7 +43,7 @@ paths:
         '403':
           description: Forbidden
           schema:
-            $ref: '#/definitions/RegistrationStatus'
+            $ref: '#/definitions/ErrorResponse'
         '404':
           description: Not Found
 
@@ -65,7 +65,7 @@ paths:
         '403':
           description: Forbidden
           schema:
-            $ref: '#/definitions/Overview'
+            $ref: '#/definitions/ErrorResponse'
         '404':
           description: Not Found
 
@@ -87,7 +87,7 @@ paths:
         '403':
           description: Forbidden
           schema:
-            $ref: '#/definitions/List'
+            $ref: '#/definitions/ErrorResponse'
         '404':
           description: Not Found
 
@@ -113,7 +113,7 @@ paths:
         '403':
           description: Forbidden
           schema:
-            $ref: '#/definitions/Commit'
+            $ref: '#/definitions/ErrorResponse'
         '404':
           description: Not Found
   
@@ -135,7 +135,7 @@ paths:
         '403':
           description: Forbidden
           schema:
-            $ref: '#/definitions/List'
+            $ref: '#/definitions/ErrorResponse'
         '404':
           description: Not Found
 
@@ -159,7 +159,7 @@ paths:
         '403':
           description: Forbidden
           schema:
-            $ref: '#/definitions/Branch'
+            $ref: '#/definitions/ErrorResponse'
         '400':
           description: Bad Request
         '404':
@@ -281,4 +281,13 @@ definitions:
     required:
       - status
       - reason
-  
+  ErrorResponse:
+    required:
+      - status
+      - reason
+    properties:
+      status:
+        type: string
+        pattern: failure
+      reason:
+        type: string

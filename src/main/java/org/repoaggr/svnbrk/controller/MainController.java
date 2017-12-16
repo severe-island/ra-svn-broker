@@ -34,136 +34,84 @@ public final class MainController {
     // Регистрация репозитория в сервисе --------------------------------------
     public static ResponseEntity<RegistrationStatus> postRegistrationStatus(
             String url, String login, String password, String id)
+            throws SVNException, IOException
     {
-        try {
-            // Если репозиторий уже зарегистрирован - вернуть ошибку.
-            if(LocalCacheController.localExists(id))
-                throw new UnsupportedOperationException(
-                        "Repository " + id + " is already registered.");
+        // Если репозиторий уже зарегистрирован - вернуть ошибку.
+        if(LocalCacheController.localExists(id))
+            throw new UnsupportedOperationException(
+                    "Repository " + id + " is already registered.");
 
-            // Получение обзора удалённого репозитория
-            Meta meta;
-            if(login != null && password != null) {
-                meta = new Meta(url, login, password);
-            }
-            else {
-                meta = new Meta(url,"", "");
-            }
-            Overview overview = RemoteSvnController
-                    .getOverview(meta);
-
-            // Создание локальной записи
-            LocalCacheController
-                    .cachingObject(id, CACHE_OVERVIEW, overview);
-            LocalCacheController
-                    .cachingObject(id, CACHE_META, meta);
-
-            return new ResponseEntity<RegistrationStatus>(
-                    new RegistrationStatus("success", "success"),
-                    HttpStatus.CREATED
-            );
-        } catch(SVNException e) {
-            return new ResponseEntity<RegistrationStatus>(
-                    new RegistrationStatus(
-                            "failure",
-                            "Registration not completed: " + e.getMessage()),
-                    HttpStatus.FORBIDDEN
-            );
-        } catch(IOException e) {
-            return new ResponseEntity<RegistrationStatus>(
-                    new RegistrationStatus(
-                            "failure",
-                            "Registration not completed: " + e.getMessage()),
-                    HttpStatus.INTERNAL_SERVER_ERROR
-            );
+        // Получение обзора удалённого репозитория
+        Meta meta;
+        if(login != null && password != null) {
+            meta = new Meta(url, login, password);
         }
+        else {
+            meta = new Meta(url,"", "");
+        }
+        Overview overview = RemoteSvnController
+                .getOverview(meta);
+
+        // Создание локальной записи
+        LocalCacheController
+                .cachingObject(id, CACHE_OVERVIEW, overview);
+        LocalCacheController
+                .cachingObject(id, CACHE_META, meta);
+
+        return new ResponseEntity<RegistrationStatus>(
+                new RegistrationStatus("success", "success"),
+                HttpStatus.CREATED
+        );
     }
 
     // Обзор репозитория ------------------------------------------------------
     public static ResponseEntity<Overview> getOverview(String id)
+            throws SVNException, IOException, ClassNotFoundException
     {
-        try {
-            // Вытягивается локальная копия обзора
-            Overview cachedOverview = (Overview) LocalCacheController
-                    .uncachingObject(id, CACHE_OVERVIEW);
-            Meta meta = (Meta) LocalCacheController
-                    .uncachingObject(id, CACHE_META);
+        // Вытягивается локальная копия обзора
+        Overview cachedOverview = (Overview) LocalCacheController
+                .uncachingObject(id, CACHE_OVERVIEW);
+        Meta meta = (Meta) LocalCacheController
+                .uncachingObject(id, CACHE_META);
 
-            // Возвращается 0, если не удалось соединиться.
-            BigDecimal lastRevisionDate = RemoteSvnController
-                    .getLastSyncDate(meta);
-            // Если нет соединения, то используется локальная копия
-            if(lastRevisionDate.equals(BigDecimal.ZERO)) {
-                cachedOverview.setStatus("warning");
-                cachedOverview.setReason("Cannot connect to remote repository. Cached data is used.");
-                return new ResponseEntity<Overview>(cachedOverview, HttpStatus.OK);
-            }
-            // Если даты совпадают, то используется локальная копия
-            if (cachedOverview.getData().getLastSychDate()
-                    .equals(lastRevisionDate)) {
-                updateMetadata(id, meta);
-                return new ResponseEntity<Overview>(cachedOverview, HttpStatus.OK);
-            }
-
-            // Иначе - вытягивается с репозитория
+        // Возвращается 0, если не удалось соединиться.
+        BigDecimal lastRevisionDate = RemoteSvnController
+                .getLastSyncDate(meta);
+        // Если нет соединения, то используется локальная копия
+        if(lastRevisionDate.equals(BigDecimal.ZERO)) {
+            cachedOverview.setStatus("warning");
+            cachedOverview.setReason("Cannot connect to remote repository. Cached data is used.");
+            return new ResponseEntity<Overview>(cachedOverview, HttpStatus.OK);
+        }
+        // Если даты совпадают, то используется локальная копия
+        if (cachedOverview.getData().getLastSychDate()
+                .equals(lastRevisionDate)) {
             updateMetadata(id, meta);
-            Overview overview = RemoteSvnController.getOverview(meta);
+            return new ResponseEntity<Overview>(cachedOverview, HttpStatus.OK);
+        }
 
-            return new ResponseEntity<Overview>(overview, HttpStatus.OK);
-        }
-        catch (SVNException e) {
-            return new ResponseEntity<Overview>(
-                    new Overview(
-                            "failure",
-                            "Remote repository failure: " + e.getMessage()),
-                    HttpStatus.FORBIDDEN
-            );
-        }
-        catch (IOException e) {
-            return new ResponseEntity<Overview>(
-                    new Overview(
-                            "failure",
-                            "Cache failure: " + e.getMessage()),
-                    HttpStatus.FORBIDDEN
-            );
-        }
-        catch (ClassNotFoundException e) {
-            return new ResponseEntity<Overview>(
-                    new Overview("failure", e.getMessage()),
-                    HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
+        // Иначе - вытягивается с репозитория
+        updateMetadata(id, meta);
+        Overview overview = RemoteSvnController.getOverview(meta);
+
+        return new ResponseEntity<Overview>(overview, HttpStatus.OK);
     }
 
     // Данные по коммиту ------------------------------------------------------
-    public static ResponseEntity<Commit> getCommit(String repoId, String commitId) {
-        try {
-            Meta meta = (Meta) LocalCacheController.uncachingObject(repoId, CACHE_META);
-            CommitData data = RemoteSvnController.getCommitMetaData(meta, commitId);
-            RemoteSvnController.downloadCommit(meta, commitId,
-                    LocalCacheController.dirTemp(repoId, CACHE_TEMP));
-            data = LocalCacheController.parseCommitFile(repoId, CACHE_TEMP, data);
-            Files.delete(Paths.get(LocalCacheController.dirTemp(repoId, CACHE_TEMP)));
-            Commit commit = new Commit("success", "success");
-            commit.setData(data);
-            return new ResponseEntity<Commit>(
-                    commit,
-                    HttpStatus.OK
-            );
-        }
-        catch (SVNException e) {
-            e.printStackTrace();
-            return new ResponseEntity<Commit>(
-                    new Commit("failure", e.getMessage()),
-                    HttpStatus.FORBIDDEN
-            );
-        }
-        catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return new ResponseEntity<Commit>(
-                    new Commit("failure", e.getMessage()),
-                    HttpStatus.INTERNAL_SERVER_ERROR
-            );
-        }
+    public static ResponseEntity<Commit> getCommit(String repoId, String commitId)
+        throws SVNException, IOException, ClassNotFoundException
+    {
+        Meta meta = (Meta) LocalCacheController.uncachingObject(repoId, CACHE_META);
+        CommitData data = RemoteSvnController.getCommitMetaData(meta, commitId);
+        RemoteSvnController.downloadCommit(meta, commitId,
+                LocalCacheController.dirTemp(repoId, CACHE_TEMP));
+        data = LocalCacheController.parseCommitFile(repoId, CACHE_TEMP, data);
+        Files.delete(Paths.get(LocalCacheController.dirTemp(repoId, CACHE_TEMP)));
+        Commit commit = new Commit("success", "success");
+        commit.setData(data);
+        return new ResponseEntity<>(
+                commit,
+                HttpStatus.OK
+        );
     }
 }
