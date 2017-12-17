@@ -15,7 +15,7 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
+#*.jar
 *.war
 *.ear
 *.zip
@@ -30,7 +30,7 @@ hs_err_pid*
 #-----------------
 
 .gradle
-/build/
+#/build/
 !gradle/wrapper/gradle-wrapper.jar
 
 # Ignore Gradle GUI config
@@ -163,7 +163,7 @@ local.properties
 
 ### NetBeans ###
 nbproject/private/
-build/
+#build/
 nbbuild/
 dist/
 nbdist/

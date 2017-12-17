@@ -1,20 +1,13 @@
 package org.repoaggr.svnbrk.controller;
 
-import com.sun.deploy.util.SystemUtils;
 import org.repoaggr.svnbrk.model.CommitData;
 import org.repoaggr.svnbrk.model.CommitDataFiles;
-import org.repoaggr.svnbrk.model.Overview;
 
 import java.io.*;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Clock;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,12 +35,14 @@ public final class LocalCacheController {
     {
         int positiveDelta = 0;
         int negativeDelta = 0;
-        Pattern p_titles = Pattern.compile("\\+\\+\\+.*\\(.*\\)"); // Поиск названий файлов
-        Pattern p_deltas = Pattern.compile("@@.*@@"); // Поиск строки дельт
-        Pattern p_positiveDelta = Pattern.compile("\\+\\d+(,\\d+)*");   // Поиск положительной дельты
-        Pattern p_negativeDelta = Pattern.compile("-\\d+(,\\d+)*"); // Поиск отрицательной дельты
-        //List<CommitDataFiles> files = new ArrayList<CommitDataFiles>();
-        //String temp = dirPath(id) + separator + tempPath;
+        Pattern p_titles = Pattern
+                .compile("\\+\\+\\+.*\\(.*\\)"); // Поиск названий файлов
+        Pattern p_deltas = Pattern
+                .compile("@@.*@@"); // Поиск строки дельт
+        Pattern p_positiveDelta = Pattern
+                .compile("\\+\\d+(,\\d+)*"); // Поиск положительной дельты
+        Pattern p_negativeDelta = Pattern
+                .compile("-\\d+(,\\d+)*"); // Поиск отрицательной дельты
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(
                         new FileInputStream(dirPath(id) + separator + tempPath),
@@ -65,21 +60,24 @@ public final class LocalCacheController {
                         lastIndex = data.getFiles().indexOf(file);
                     }
                 }
-                //files.add(new CommitDataFiles(line.substring(4).split("\t")[0]));
             }
             else if(p_deltas.matcher(line).matches() && fileIsChanged) {
                 Matcher m_positiveDelta = p_positiveDelta.matcher(line);
                 Matcher m_negativeDelta = p_negativeDelta.matcher(line);
                 if (m_positiveDelta.find()) {
                     String[] temp = m_positiveDelta.group().split("\\+|,");
-                    int localPositiveDelta = temp.length == 2 ? 1 : Integer.valueOf(temp[2]);
-                    data.getFiles().get(lastIndex).setPositiveDelta(localPositiveDelta);
+                    int localPositiveDelta =
+                            temp.length == 2 ? 1 : Integer.valueOf(temp[2]);
+                    data.getFiles().get(lastIndex)
+                            .setPositiveDelta(localPositiveDelta);
                     positiveDelta += localPositiveDelta;
                 }
                 if (m_negativeDelta.find()) {
                     String[] temp = m_negativeDelta.group().split("-|,");
-                    int localNegativeDelta = temp.length == 2 ? 1 : Integer.valueOf(temp[2]);
-                    data.getFiles().get(lastIndex).setNegativeDelta(localNegativeDelta);
+                    int localNegativeDelta =
+                            temp.length == 2 ? 1 : Integer.valueOf(temp[2]);
+                    data.getFiles().get(lastIndex)
+                            .setNegativeDelta(localNegativeDelta);
                     negativeDelta += localNegativeDelta;
                 }
                 fileIsChanged = false;
@@ -88,12 +86,8 @@ public final class LocalCacheController {
         reader.close();
         data.setPositiveDelta(positiveDelta);
         data.setNegativeDelta(negativeDelta);
-        //data.setFiles(files);
         return data;
     }
-    /*private static String overviewPath(Path dir) {
-        return dir.toString() + separator + "overview";
-    }*/
 
     public static boolean localExists(String id) {
         return Files.exists(dirPath(id));

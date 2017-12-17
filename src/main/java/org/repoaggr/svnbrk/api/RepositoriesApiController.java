@@ -36,14 +36,12 @@ public class RepositoriesApiController implements RepositoriesApi {
     public ResponseEntity<Branch> repositoriesIdBranchesBranchIdGet(
             @ApiParam(value = "",required=true ) @PathVariable("id") String id,
             @ApiParam(value = "",required=true ) @PathVariable("branch_id") String branchId)
-            throws SVNException, IOException, ClassNotFoundException
     {
         return MainController.getBranch(id, branchId);
     }
 
     public ResponseEntity<BrokerList> repositoriesIdBranchesGet(
             @ApiParam(value = "",required=true ) @PathVariable("id") String id)
-            throws SVNException, IOException, ClassNotFoundException
     {
         return MainController.getBranchesList(id);
     }
@@ -51,21 +49,18 @@ public class RepositoriesApiController implements RepositoriesApi {
     public ResponseEntity<Commit> repositoriesIdCommitCommitIdGet(
             @ApiParam(value = "",required=true ) @PathVariable("id") String id,
             @ApiParam(value = "",required=true ) @PathVariable("commit_id") String commitId)
-            throws SVNException, IOException, ClassNotFoundException
     {
         return MainController.getCommit(id, commitId);
     }
 
     public ResponseEntity<BrokerList> repositoriesIdCommitsGet(
             @ApiParam(value = "",required=true ) @PathVariable("id") String id)
-            throws SVNException, IOException, ClassNotFoundException
     {
         return MainController.getCommitsList(id);
     }
 
     public ResponseEntity<Overview> repositoriesIdGet(
             @ApiParam(value = "",required=true ) @PathVariable("id") String id)
-            throws SVNException, IOException, ClassNotFoundException
     {
         return MainController.getOverview(id);
     }
@@ -75,7 +70,6 @@ public class RepositoriesApiController implements RepositoriesApi {
             @ApiParam(value = "", required=true) @RequestPart(value="id", required=true)  String id,
             @ApiParam(value = "") @RequestPart(value="login", required=false)  String login,
             @ApiParam(value = "") @RequestPart(value="password", required=false)  String password)
-            throws SVNException, IOException
     {
         return MainController.postRegistrationStatus(url, login, password, id);
     }

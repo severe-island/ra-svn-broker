@@ -1,3 +1,3 @@
 @ECHO OFF
 
-java -jar build/libs/svn-broker-0.0.3-SNAPSHOT.jar --server.port=3003
+java -jar build/libs/svn-broker-0.0.4-SNAPSHOT.jar --server.port=3003

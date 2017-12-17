@@ -1,29 +1,26 @@
 package org.repoaggr.svnbrk.controller;
 
-import jdk.vm.ci.meta.MemoryAccessProvider;
 import org.repoaggr.svnbrk.model.*;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.tmatesoft.svn.core.*;
+import org.tmatesoft.svn.core.io.SVNRepository;
+import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 import org.tmatesoft.svn.core.wc.SVNDiffClient;
 import org.tmatesoft.svn.core.wc.SVNRevision;
 import org.tmatesoft.svn.core.wc.SVNWCUtil;
-import org.tmatesoft.svn.core.auth.ISVNAuthenticationManager;
-import org.tmatesoft.svn.core.io.SVNRepository;
-import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
-import org.joda.time.DateTime;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.Clock;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+
+import static org.repoaggr.svnbrk.configuration.Constants.*;
 
 public final class RemoteSvnController {
     private RemoteSvnController() { }
 
-    // Служебное ==============================================================
     // Подготовка репозитория
     private static SVNRepository getRepository(Meta meta)
             throws SVNException
@@ -45,14 +42,14 @@ public final class RemoteSvnController {
 
     // Получение размера директории репозитория
     public static long getSize(SVNRepository repository) throws SVNException {
-        // СДЕЛАТЬ РАСЧЁТ РАЗМЕРА АСИНХРОННЫМ!
         return getSize(repository, "/");
     }
 
     private static long getSize(SVNRepository repository, String path)
             throws SVNException {
         long size = 0;
-        Collection entries = repository.getDir(path, -1, null, (Collection)null);
+        Collection entries = repository
+                .getDir(path, -1, null, (Collection)null);
         Iterator iterator = entries.iterator();
         while (iterator.hasNext()) {
             SVNDirEntry entry = (SVNDirEntry) iterator.next();
@@ -62,7 +59,6 @@ public final class RemoteSvnController {
                                 ? entry.getName()
                                 : path + "/" + entry.getName());
             } else {
-                //System.out.println(size);
                 size += entry.getSize();
             }
         }
@@ -108,7 +104,8 @@ public final class RemoteSvnController {
             CommitDataFiles file = (CommitDataFiles) iterator.next();
             if(!isParent(file.getPath(), parent)) {
                 parent = getParent(file.getPath());
-                entries = repository.getDir(parent, revision, null, (Collection)null);
+                entries = repository
+                        .getDir(parent, revision, null, (Collection)null);
             }
             for (Iterator iterator1 = entries.iterator(); iterator1.hasNext();) {
                 SVNDirEntry entry = ((SVNDirEntry) iterator1.next());
@@ -148,11 +145,9 @@ public final class RemoteSvnController {
                 ),
                 "svn",
                 meta.getUrl(),
-                //new BigDecimal(getSize(repository))
                 BigDecimal.ZERO
         );
-        //Overview overview = new Overview("success", "success");
-        Overview overview = new Overview("warning", "Size is calculating. Please, wait.");
+        Overview overview = new Overview(STATUS_WARN, W_SIZE_PROCESSING);
         overview.setData(data);
         AsyncLocalRemoteController.asyncGetRepositorySize(id, repository);
         return overview;
@@ -221,29 +216,50 @@ public final class RemoteSvnController {
     // Вытягивание данных по конкретной ветке ---------------------------------
     public static Branch getBranch(Meta meta, String branchId) throws SVNException {
         SVNRepository repository = getRepository(meta);
-        String path = "/branches/" + branchId;
-        SVNLogEntry logEntry = (SVNLogEntry) repository.log(
-                new String[] { path },
-                null,
-                0,
-                repository.getLatestRevision(),
-                false,
-                true
-        ).iterator().next();
-        String lock = ((SVNDirEntry)repository.getDir(
-                path,
-                logEntry.getRevision(),
-                null,
-                (Collection)null
-        ).iterator().next()).getLock() == null ? "unlocked" : "locked";
-        BranchData data = new BranchData(
-                branchId,
-                lock,
-                new BigDecimal(logEntry.getDate().getTime()),
-                String.valueOf(logEntry.getRevision()),
-                logEntry.getAuthor()
-        );
-        return new Branch("success", "success", data);
+        // Если не ветка trunk
+        if (branchId.equals("trunk")) {
+            String path = "/branches/" + branchId;
+            SVNLogEntry logEntry = (SVNLogEntry) repository.log(
+                    new String[]{path},
+                    null,
+                    0,
+                    repository.getLatestRevision(),
+                    false,
+                    true
+            ).iterator().next();
+            String lock = ((SVNDirEntry) repository.getDir(
+                    path,
+                    logEntry.getRevision(),
+                    null,
+                    (Collection) null
+            ).iterator().next()).getLock() == null ? "unlocked" : "locked";
+            BranchData data = new BranchData(
+                    branchId,
+                    lock,
+                    new BigDecimal(logEntry.getDate().getTime()),
+                    String.valueOf(logEntry.getRevision()),
+                    logEntry.getAuthor()
+            );
+            return new Branch(STATUS_SUCCESS, S_SUCCESS, data);
+        }
+        else {
+            SVNLogEntry logEntry = (SVNLogEntry) repository.log(
+                    new String[]{ "/" },
+                    null,
+                    1,
+                    1,
+                    false,
+                    true
+            ).iterator().next();
+            BranchData data = new BranchData(
+                    branchId,
+                    "unlocked",
+                    new BigDecimal(logEntry.getDate().getTime()),
+                    "1",
+                    logEntry.getAuthor()
+            );
+            return new Branch(STATUS_SUCCESS, S_SUCCESS, data);
+        }
     }
 
     // Вытягивание списка веток -----------------------------------------------
@@ -259,7 +275,7 @@ public final class RemoteSvnController {
                     (Collection) null
             ).forEach(item -> list.add(((SVNDirEntry) item).getName()));
         }
-        return new BrokerList("success", "success", list);
+        return new BrokerList(STATUS_SUCCESS, S_SUCCESS, list);
     }
 
     // Вытягивание списка коммитов --------------------------------------------
@@ -270,6 +286,6 @@ public final class RemoteSvnController {
             System.out.println(i);
             list.add(String.valueOf(i));
         }
-        return new BrokerList("success", "success", list);
+        return new BrokerList(STATUS_SUCCESS, S_SUCCESS, list);
     }
 }

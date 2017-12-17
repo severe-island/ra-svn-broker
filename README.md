@@ -33,13 +33,23 @@ Using POST-requests for /repositories requires the HTTP-headers:
 Content-Type: multipart/form-data; boundary=HereGoes
 ```
 
-Curl example:
+## Testing
+
+You can use for test SVN-repository of the Codeblocks project: http://svn.code.sf.net/p/codeblocks/code
+First of all you need to register your repository in web-service. You can do it with [Curl](https://curl.haxx.se/):
 
 ``` bash
-curl -F "url=http://svn.example.org/code" \
-    -F "login=john_cena" \
-    -F "password=tutudutu" \
-    -F "id=111" \
-    -H "Content-Type: multipart/form-data; boundary=HereGoes" \
-    -X POST "http://localhost:3003/repositories"
+curl -F "url=svn://svn.code.sf.net/p/codeblocks/code" \
+     -F "id=codeblocks" \
+     -H "Content-Type: multipart/form-data; boundary=HereGoes" \
+     -X POST http://localhost:3003/repositories
 ```
+
+After you can do GET-requests to repository using ID, which you noted on registration:
+* /repositories/{id} -- shows overview information for repository with {id};
+* /repositories/{id}/commits -- shows list of commits for repository with {id};
+* /repositories/{id}/branches -- shows list of branches for repository with {id};
+* /repositories/{id}/commits/{commitId} -- shows overview information for commit named {commitId} in repository {id};
+* /repositories/{id}/branches/{branchId} -- shows overview information for branch named {branchId} in repository {id};
+
+Note: Some caching processes are working asynchronously and taking time. You can see info about it in warnings. Please, don't stop web-service until they finished.

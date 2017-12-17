@@ -34,27 +34,18 @@ public class CommitData   {
   private int negativeDelta = 0;
 
   @JsonProperty("branch")
-  private String branch = null;
+  private String branch = "";
 
   @JsonProperty("files")
   private List<CommitDataFiles> files = null;
 
   public CommitData(
-          /*BigDecimal committedAt,
-          String message,
-          String committer,*/
           int positiveDelta,
           int negativeDelta,
-          //String branch,
           List<CommitDataFiles> files
   ) {
-    /*
-      this.committedAt = committedAt;
-      this.message = message;
-      this.committer = committer;*/
       this.positiveDelta = positiveDelta;
       this.negativeDelta = negativeDelta;
-      //this.branch = branch;
       this.files = files;
   }
 
