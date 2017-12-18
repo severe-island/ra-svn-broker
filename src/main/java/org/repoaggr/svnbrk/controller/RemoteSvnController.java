@@ -217,7 +217,7 @@ public final class RemoteSvnController {
     public static Branch getBranch(Meta meta, String branchId) throws SVNException {
         SVNRepository repository = getRepository(meta);
         // Если не ветка trunk
-        if (branchId.equals("trunk")) {
+        if (!branchId.equals("trunk")) {
             String path = "/branches/" + branchId;
             SVNLogEntry logEntry = (SVNLogEntry) repository.log(
                     new String[]{path},
