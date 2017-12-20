@@ -32,7 +32,7 @@ public final class MainController {
             // Если репозиторий уже зарегистрирован - вернуть ошибку.
             if (LocalCacheController.localExists(id))
                 throw new CacheException(
-                        "Repository " + id + " is already registered.");
+                        "Repository '" + id + "' is already registered.");
 
             // Получение обзора удалённого репозитория
             Meta meta;
@@ -46,8 +46,7 @@ public final class MainController {
 
             // Создание кэша списка коммитов и запуск их асинхронного подсчёта.
             BrokerList list = new BrokerList(STATUS_WARN,
-                    W_COMMITS_PROCESSING,
-                    null);
+                    W_COMMITS_PROCESSING);
             LocalCacheController.cachingObject(id, CACHE_COMMITS, list);
             AsyncLocalRemoteController.asyncGetCommitsList(id, meta);
 
@@ -63,10 +62,10 @@ public final class MainController {
             );
         }
         catch (SVNException e) {
-            throw new RemoteException();
+            throw new RemoteException(e.getMessage());
         }
         catch (IOException e) {
-            throw new CacheException();
+            throw new CacheException(e.getMessage());
         }
     }
 
@@ -103,10 +102,10 @@ public final class MainController {
             return new ResponseEntity<>(overview, HttpStatus.OK);
         }
         catch (SVNException e) {
-            throw new RemoteException();
+            throw new RemoteException(e.getMessage());
         }
         catch (IOException | ClassNotFoundException e) {
-            throw new CacheException();
+            throw new CacheException(e.getMessage());
         }
     }
 
@@ -132,10 +131,10 @@ public final class MainController {
             );
         }
         catch (SVNException e) {
-            throw new RemoteException();
+            throw new RemoteException(e.getMessage());
         }
         catch (IOException | ClassNotFoundException e) {
-            throw new CacheException();
+            throw new CacheException(e.getMessage());
         }
     }
 
@@ -150,10 +149,10 @@ public final class MainController {
             );
         }
         catch (SVNException e) {
-            throw new RemoteException();
+            throw new RemoteException(e.getMessage());
         }
         catch (IOException | ClassNotFoundException e) {
-            throw new CacheException();
+            throw new CacheException(e.getMessage());
         }
     }
 
@@ -168,10 +167,10 @@ public final class MainController {
             );
         }
         catch (SVNException e) {
-            throw new RemoteException();
+            throw new RemoteException(e.getMessage());
         }
         catch (IOException | ClassNotFoundException e) {
-            throw new CacheException();
+            throw new CacheException(e.getMessage());
         }
     }
 
@@ -205,14 +204,7 @@ public final class MainController {
             return new ResponseEntity<>(list, HttpStatus.OK);
         }
         catch (IOException | ClassNotFoundException e) {
-            throw new CacheException();
+            throw new CacheException(e.getMessage());
         }
-        /*
-        Meta meta = (Meta) LocalCacheController.uncachingObject(id, CACHE_META);
-        return new ResponseEntity<BrokerList>(
-                RemoteSvnController.getCommitsList(meta),
-                HttpStatus.OK
-        );
-        */
     }
 }

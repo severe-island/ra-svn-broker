@@ -25,12 +25,17 @@ public class BrokerList implements Serializable {
   private String reason = null;
 
   @JsonProperty("data")
-  private List<String> data = null;
+  private List<String> data = new ArrayList<>();
+
+    public BrokerList(String status, String reason) {
+        this.status = status;
+        this.reason = reason;
+    }
 
   public BrokerList(String status, String reason, List<String> data) {
       this.status = status;
       this.reason = reason;
-      this.data = data;
+      this.data.addAll(data);
   }
 
   public BrokerList status(String status) {

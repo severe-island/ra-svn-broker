@@ -17,6 +17,7 @@ public final class LocalCacheController {
 
     private static String separator;
 
+    // Получение пути к директории соответствующего репозитория
     private static Path dirPath(String id) {
         String os = System.getProperty("os.name").toLowerCase();
         if (os.contains("win"))
@@ -26,10 +27,12 @@ public final class LocalCacheController {
         return Paths.get("cache" + separator + id);
     }
 
+    // Получение пути к временному файлу репозитория
     public static String dirTemp(String id, String tempPath) {
         return dirPath(id) + separator + tempPath;
     }
 
+    // Получение дельт из временного файла репозитория
     public static CommitData parseCommitFile(String id, String tempPath, CommitData data)
             throws IOException
     {
@@ -89,10 +92,12 @@ public final class LocalCacheController {
         return data;
     }
 
+    // Существует ли директория для соотвутствующего репозитория
     public static boolean localExists(String id) {
         return Files.exists(dirPath(id));
     }
 
+    // Кэширование объекта
     public static void cachingObject(String id, String filename, Object record)
             throws IOException {
         Path dir = dirPath(id);
@@ -107,6 +112,8 @@ public final class LocalCacheController {
         oos.flush();
         oos.close();
     }
+
+    // Считывание объекта из кэша
     public static Object uncachingObject(String id, String filename)
             throws IOException, ClassNotFoundException
     {
@@ -115,5 +122,21 @@ public final class LocalCacheController {
         );
         ObjectInputStream oin = new ObjectInputStream(fis);
         return oin.readObject();
+    }
+
+    // Удаление директории соответствующего репозитория
+    public static void deleteDirectory(String id) {
+        deleteDirectory(new File(dirPath(id).toString()));
+    }
+
+    private static void deleteDirectory(File dir) {
+        if (dir.isDirectory()) {
+            String[] children = dir.list();
+            for (int i=0; i < children.length; i++) {
+                File f = new File(dir, children[i]);
+                deleteDirectory(f);
+            }
+            dir.delete();
+        } else dir.delete();
     }
 }

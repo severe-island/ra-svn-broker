@@ -283,7 +283,6 @@ public final class RemoteSvnController {
         SVNRepository repository = getRepository(meta);
         List<String> list = new ArrayList<>();
         for(long i = 1; i <= repository.getLatestRevision(); i++) {
-            System.out.println(i);
             list.add(String.valueOf(i));
         }
         return new BrokerList(STATUS_SUCCESS, S_SUCCESS, list);

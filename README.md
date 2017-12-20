@@ -2,8 +2,8 @@
 
 ## Requirement
 
-* Java v.9.0.1 (or highter)
-* Gradle v.4.3.1 (or highter)
+* Java 8 (or highter)
+* Gradle 4.3.1 (or highter)
 
 ## Building
 
@@ -36,6 +36,7 @@ Content-Type: multipart/form-data; boundary=HereGoes
 ## Testing
 
 You can use for test SVN-repository of the Codeblocks project: http://svn.code.sf.net/p/codeblocks/code
+
 First of all you need to register your repository in web-service. You can do it with [Curl](https://curl.haxx.se/):
 
 ``` bash
@@ -46,10 +47,15 @@ curl -F "url=svn://svn.code.sf.net/p/codeblocks/code" \
 ```
 
 After you can do GET-requests to repository using ID, which you noted on registration:
-* /repositories/{id} -- shows overview information for repository with {id};
-* /repositories/{id}/commits -- shows list of commits for repository with {id};
-* /repositories/{id}/branches -- shows list of branches for repository with {id};
-* /repositories/{id}/commits/{commitId} -- shows overview information for commit named {commitId} in repository {id};
-* /repositories/{id}/branches/{branchId} -- shows overview information for branch named {branchId} in repository {id};
+* /repositories/{id} - shows overview information for repository with {id};
+* /repositories/{id}/commits - shows list of commits for repository with {id};
+* /repositories/{id}/branches - shows list of branches for repository with {id};
+* /repositories/{id}/commits/{commitId} - shows overview information for commit named {commitId} in repository {id};
+* /repositories/{id}/branches/{branchId} - shows overview information for branch named {branchId} in repository {id};
+
+You can also run the Unit-tests:
+``` bash
+gradle test
+```
 
 Note: Some caching processes are working asynchronously and taking time. You can see info about it in warnings. Please, don't stop web-service until they finished.
