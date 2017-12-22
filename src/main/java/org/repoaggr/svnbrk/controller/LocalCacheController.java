@@ -8,8 +8,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static org.repoaggr.svnbrk.configuration.Constants.CACHE;
 
 public final class LocalCacheController {
     private LocalCacheController() {
@@ -24,7 +29,7 @@ public final class LocalCacheController {
             separator = "\\";
         else
             separator = "/";
-        return Paths.get("cache" + separator + id);
+        return Paths.get(CACHE + separator + id);
     }
 
     // Получение пути к временному файлу репозитория
@@ -124,6 +129,17 @@ public final class LocalCacheController {
         return oin.readObject();
     }
 
+    // Получение списка файлов из директории кэша
+    public static List<String> contentCache() throws IOException {
+        if(!Files.exists(Paths.get(CACHE)))
+            return new ArrayList<>();
+        return Files.walk(Paths.get(CACHE))
+                .filter(Files::isDirectory)
+                .filter(path -> !path.getFileName().toString().equals(CACHE))
+                .map(path -> path.getFileName().toString())
+                .collect(Collectors.toList());
+    }
+
     // Удаление директории соответствующего репозитория
     public static void deleteDirectory(String id) {
         deleteDirectory(new File(dirPath(id).toString()));
@@ -132,7 +148,7 @@ public final class LocalCacheController {
     private static void deleteDirectory(File dir) {
         if (dir.isDirectory()) {
             String[] children = dir.list();
-            for (int i=0; i < children.length; i++) {
+            for (int i = 0; i < children.length; i++) {
                 File f = new File(dir, children[i]);
                 deleteDirectory(f);
             }

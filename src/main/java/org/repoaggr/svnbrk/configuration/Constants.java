@@ -2,6 +2,8 @@ package org.repoaggr.svnbrk.configuration;
 
 public final class Constants {
     // Пути
+    public static final String TEST_REPO_ID = "__test__";
+    public static final String CACHE = "cache";
     public static final String CACHE_TEMP = "temp";
     public static final String CACHE_OVERVIEW = "overview";
     public static final String CACHE_META = "_meta";

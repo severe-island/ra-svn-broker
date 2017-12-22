@@ -207,4 +207,18 @@ public final class MainController {
             throw new CacheException(e.getMessage());
         }
     }
+
+    // Список зарегистрированных репозиториев ---------------------------------
+    public static ResponseEntity<BrokerList> getRepositories() {
+        try {
+            return new ResponseEntity<>(new BrokerList(
+                    STATUS_SUCCESS,
+                    S_SUCCESS,
+                    LocalCacheController.contentCache()
+            ), HttpStatus.OK);
+        }
+        catch (IOException e) {
+            throw new CacheException(e.getMessage());
+        }
+    }
 }

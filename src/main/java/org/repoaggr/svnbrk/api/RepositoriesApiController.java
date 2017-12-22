@@ -31,8 +31,6 @@ import org.tmatesoft.svn.core.SVNException;
 @Controller
 public class RepositoriesApiController implements RepositoriesApi {
 
-
-
     public ResponseEntity<Branch> repositoriesIdBranchesBranchIdGet(
             @ApiParam(value = "",required=true ) @PathVariable("id") String id,
             @ApiParam(value = "",required=true ) @PathVariable("branch_id") String branchId)
@@ -74,8 +72,7 @@ public class RepositoriesApiController implements RepositoriesApi {
         return MainController.postRegistrationStatus(url, login, password, id);
     }
 
-    /*@Override
-    public ErrorResponse handle(SVNException e) {
-        return new ErrorResponse("failure", e.getMessage());
-    }*/
+    public ResponseEntity<BrokerList> repositoriesGet() {
+        return MainController.getRepositories();
+    }
 }

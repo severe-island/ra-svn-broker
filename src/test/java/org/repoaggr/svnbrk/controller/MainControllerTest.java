@@ -4,8 +4,9 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import static org.repoaggr.svnbrk.configuration.Constants.TEST_REPO_ID;
+
 class MainControllerTest {
-    private static final String REPO_ID = "__test__";
     private static final String COMMIT_ID = "962";
     private static final String BRANCH_ID = "trunk";
     private static final String URL_ID = "https://svn.apache.org/repos/asf";
@@ -14,37 +15,38 @@ class MainControllerTest {
 
     @AfterAll
     static void removeTestRepo() {
-        LocalCacheController.deleteDirectory(REPO_ID);
+        LocalCacheController.deleteDirectory(TEST_REPO_ID);
     }
 
     @BeforeAll
     static void postRegistrationStatus() {
-        MainController.postRegistrationStatus(URL_ID, LOGIN, PASSWORD, REPO_ID);
+        LocalCacheController.deleteDirectory(TEST_REPO_ID);
+        MainController.postRegistrationStatus(URL_ID, LOGIN, PASSWORD, TEST_REPO_ID);
     }
 
     @Test
     void getOverview() {
-        MainController.getOverview(REPO_ID);
+        MainController.getOverview(TEST_REPO_ID);
     }
 
     @Test
     void getCommit() {
-        MainController.getCommit(REPO_ID, COMMIT_ID);
+        MainController.getCommit(TEST_REPO_ID, COMMIT_ID);
     }
 
     @Test
     void getBranch() {
-        MainController.getBranch(REPO_ID, BRANCH_ID);
+        MainController.getBranch(TEST_REPO_ID, BRANCH_ID);
     }
 
     @Test
     void getBranchesList() {
-        MainController.getBranchesList(REPO_ID);
+        MainController.getBranchesList(TEST_REPO_ID);
     }
 
     @Test
     void getCommitsList() {
-        MainController.getCommitsList(REPO_ID);
+        MainController.getCommitsList(TEST_REPO_ID);
     }
 
 }

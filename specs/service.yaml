@@ -4,13 +4,24 @@ info:
   description: >-
     Web-service for collecting data from SVN-repositories and transfering it to
     repository-aggregator.
-  version: 0.0.3
+  version: 0.0.5
 host: localhost:3003
 schemes:
   - http
   - https
 paths:
   /repositories:
+    get:
+      summary: Returns a list of registered repositories
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/BrokerList'    
+        '403':
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/ErrorResponse'
     post:
       summary: Register of repository.
       description: Register of repository.
@@ -38,14 +49,14 @@ paths:
           description: Created
           schema:
             $ref: '#/definitions/RegistrationStatus'
-        '400':
-          description: Bad Request
         '403':
           description: Forbidden
           schema:
             $ref: '#/definitions/ErrorResponse'
         '404':
           description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
 
   /repositories/{id}:
     get:
@@ -60,14 +71,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/Overview'
-        '400':
-          description: Bad Request
         '403':
           description: Forbidden
           schema:
             $ref: '#/definitions/ErrorResponse'
         '404':
           description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
 
   /repositories/{id}/commits:
     get:
@@ -82,14 +93,10 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/BrokerList'
-        '400':
-          description: Bad Request
         '403':
           description: Forbidden
           schema:
             $ref: '#/definitions/ErrorResponse'
-        '404':
-          description: Not Found
 
   /repositories/{id}/commits/{commit_id}:
     get:
@@ -108,14 +115,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/Commit'
-        '400':
-          description: Bad Request
         '403':
           description: Forbidden
           schema:
             $ref: '#/definitions/ErrorResponse'
         '404':
           description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
   
   /repositories/{id}/branches:
     get:
@@ -130,14 +137,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/BrokerList'
-        '400':
-          description: Bad Request
         '403':
           description: Forbidden
           schema:
             $ref: '#/definitions/ErrorResponse'
         '404':
           description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
 
   /repositories/{id}/branches/{branch_id}:
     get:
@@ -160,10 +167,10 @@ paths:
           description: Forbidden
           schema:
             $ref: '#/definitions/ErrorResponse'
-        '400':
-          description: Bad Request
         '404':
           description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
           
 definitions:
   RegistrationStatus:

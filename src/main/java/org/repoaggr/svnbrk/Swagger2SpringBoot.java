@@ -1,5 +1,6 @@
 package org.repoaggr.svnbrk;
 
+import org.repoaggr.svnbrk.controller.LocalCacheController;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
@@ -9,6 +10,8 @@ import org.springframework.boot.autoconfigure.web.ErrorMvcAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+import static org.repoaggr.svnbrk.configuration.Constants.TEST_REPO_ID;
 
 @SpringBootApplication
 @EnableSwagger2
@@ -23,6 +26,7 @@ public class Swagger2SpringBoot implements CommandLineRunner {
     }
 
     public static void main(String[] args) throws Exception {
+        LocalCacheController.deleteDirectory(TEST_REPO_ID);
         new SpringApplication(Swagger2SpringBoot.class).run(args);
     }
 
