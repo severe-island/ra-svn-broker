@@ -3,10 +3,7 @@ package org.repoaggr.svnbrk.api;
 import io.swagger.annotations.*;
 import org.repoaggr.svnbrk.model.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-09T09:35:53.477Z")
@@ -101,10 +98,8 @@ public interface RepositoriesApi {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = BrokerList.class),
             @ApiResponse(code = 403, message = "Forbidden", response = ErrorResponse.class)})
-
-    @RequestMapping(
-            value = "/repositories",
-            method = RequestMethod.GET)
+            
+    @GetMapping(value = "/repositories")
     ResponseEntity<BrokerList> repositoriesGet();
 
 }

@@ -1,14 +1,14 @@
 package org.repoaggr.svnbrk;
 
+import org.repoaggr.svnbrk.api.ApiOriginFilter;
 import org.repoaggr.svnbrk.controller.LocalCacheController;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.ExitCodeGenerator;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.web.ErrorMvcAutoConfiguration;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import static org.repoaggr.svnbrk.configuration.Constants.TEST_REPO_ID;
@@ -28,6 +28,15 @@ public class Swagger2SpringBoot implements CommandLineRunner {
     public static void main(String[] args) throws Exception {
         LocalCacheController.deleteDirectory(TEST_REPO_ID);
         new SpringApplication(Swagger2SpringBoot.class).run(args);
+    }
+
+    @Bean
+    public FilterRegistrationBean apiOriginFilter() {
+        final FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+        registrationBean.setFilter(new ApiOriginFilter());
+        registrationBean.addUrlPatterns("/*");
+
+        return registrationBean;
     }
 
     class ExitException extends RuntimeException implements ExitCodeGenerator {

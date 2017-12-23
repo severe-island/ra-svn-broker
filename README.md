@@ -2,8 +2,8 @@
 
 ## Requirement
 
-* Java 8 (or highter)
-* Gradle 4.3.1 (or highter)
+* Java 8 (or higher)
+* Gradle 4.3.1 (or higher)
 
 ## Building
 
@@ -47,11 +47,12 @@ curl -F "url=svn://svn.code.sf.net/p/codeblocks/code" \
 ```
 
 After you can do GET-requests to repository using ID, which you noted on registration:
-* /repositories/{id} - shows overview information for repository with {id};
-* /repositories/{id}/commits - shows list of commits for repository with {id};
-* /repositories/{id}/branches - shows list of branches for repository with {id};
-* /repositories/{id}/commits/{commitId} - shows overview information for commit named {commitId} in repository {id};
-* /repositories/{id}/branches/{branchId} - shows overview information for branch named {branchId} in repository {id};
+* /repositories - shows a list of registered repositories;
+* /repositories/{id} - shows an overview information for repository with {id};
+* /repositories/{id}/commits - shows a list of commits for repository with {id};
+* /repositories/{id}/branches - shows a list of branches for repository with {id};
+* /repositories/{id}/commits/{commitId} - shows an overview information for commit named {commitId} in repository {id};
+* /repositories/{id}/branches/{branchId} - shows an overview information for branch named {branchId} in repository {id};
 
 You can also run the Unit-tests:
 ``` bash
