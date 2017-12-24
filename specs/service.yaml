@@ -194,7 +194,7 @@ definitions:
       data:
         type: object
         properties:
-          last_sych_date:
+          last_sync_date:
             type: number
           repo_type:
             type: string

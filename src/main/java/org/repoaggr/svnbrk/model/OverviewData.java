@@ -16,7 +16,7 @@ import javax.validation.constraints.*;
 @javax.annotation.Generated(value = "io.swagger.codegen.languages.SpringCodegen", date = "2017-12-09T09:35:53.477Z")
 
 public class OverviewData implements Serializable {
-  @JsonProperty("last_sych_date")
+  @JsonProperty("last_sync_date")
   private BigDecimal lastSychDate = null;
 
   @JsonProperty("repo_type")

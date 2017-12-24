@@ -11,7 +11,7 @@
         "data": {
             "type": "object",
             "properties": {
-                "last_sych_date": { "type": "number" },
+                "last_sync_date": { "type": "number" },
                 "repo_type": { 
                     "type": "string",
                     "pattern": "svn"
